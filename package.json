@@ -1,0 +1,29 @@
+{
+  "name": "oql",
+  "version": "0.0.0",
+  "description": "Query JavaScript objects with SQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "babel-node ./test/*.js | faucet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwhitfieldseed/oql.git"
+  },
+  "keywords": [
+    "object",
+    "sql",
+    "query"
+  ],
+  "author": "Joe Whitfield-Seed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwhitfieldseed/oql/issues"
+  },
+  "homepage": "https://github.com/jwhitfieldseed/oql#readme",
+  "dependencies": {
+    "lodash": "^3.10.0",
+    "pegjs": "^0.8.0",
+    "tape": "^4.0.0"
+  }
+}
