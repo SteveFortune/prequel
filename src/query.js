@@ -1,8 +1,16 @@
 import _ from "lodash";
+import { binaryPredicates, unaryPredicates } from "./predicates";
 
 export default function query(parsedQuery, data) {
   const target = data[parsedQuery.source];
-  return select(target, parsedQuery.fields);
+
+  // TODO compose a lazily evaluated function
+  const mapped = select(target, parsedQuery.fields);
+  const filtered = parsedQuery.where
+    ? where(mapped, parsedQuery.where)
+    : mapped;
+
+  return filtered;
 }
 
 function select(target, fields) {
@@ -17,4 +25,18 @@ function selectFields(target, fields) {
 
 function selectAll(target) {
   return target;
+}
+
+function where(input, condition) {
+  const predicate = getPredicate(condition.op);
+  return input.filter((row) => predicate(row[condition.field], condition.value));
+}
+
+function getPredicate(op) {
+  const predicate = binaryPredicates[op] || unaryPredicates[op];
+  if(!predicate) {
+    throw new Error(`Unrecognised operation: ${op}`);
+  }
+
+  return predicate;
 }

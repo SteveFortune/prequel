@@ -4,7 +4,7 @@
   "description": "Query JavaScript objects with SQL",
   "main": "index.js",
   "scripts": {
-    "test": "babel-node ./test/*.js | faucet"
+    "test": "babel-node $(which tape) ./test/*.js | faucet"
   },
   "repository": {
     "type": "git",
