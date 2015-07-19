@@ -30,7 +30,22 @@ where
 where_condition
   = expression
 
-order_base = "ORDER BY" _ field:identifier { return { field } }
+order_base = "ORDER BY" _ order:order_tuple_list { return order }
+
+order_tuple_list
+  = head:order_tuple_delim tail:order_tuple_list { return [head].concat(tail) }
+  / only:order_tuple { return [only] }
+
+order_tuple
+  = field:identifier _ order:order_dir { return { field, order } }
+  / field:identifier { return { field } }
+
+order_tuple_delim
+  = tuple:order_tuple list_delim { return tuple }
+
+order_dir
+  = "ASC"
+  / "DESC"
 
 order
   = order_desc

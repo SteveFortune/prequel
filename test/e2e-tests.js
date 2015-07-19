@@ -40,3 +40,19 @@ test("SELECT a, b FROM ${rows} ORDER BY a DESC", (t) => {
   t.deepEqual([7, 5, 4], result.map(r => r.a));
   t.end();
 });
+
+test("SELECT * FROM ${rows} ORDER BY  ORDER BY a, b DESC, c ASC", (t) => {
+  const rows = [
+    { a: 1, b: 1, c: 1 },
+    { a: 1, b: 2, c: 2 },
+    { a: 1, b: 2, c: 3 },
+    { a: 2, b: 1, c: 4 },
+    { a: 2, b: 2, c: 5 },
+    { a: 2, b: 2, c: 6 }
+  ];
+
+  const result = oql`SELECT * FROM ${rows} ORDER BY a, b DESC, c ASC`;
+
+  t.deepEqual([2, 3, 1, 5, 6, 4], result.map(r => r.c));
+  t.end();
+});

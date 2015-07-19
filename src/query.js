@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { binaryPredicates, unaryPredicates } from "./predicates";
 
+const DEFAULT_SORT_ORDER = "asc";
+
 export default function query(parsedQuery, data) {
   const target = data[parsedQuery.source];
 
@@ -9,8 +11,6 @@ export default function query(parsedQuery, data) {
   const filtered = parsedQuery.where
     ? where(mapped, parsedQuery.where)
     : mapped;
-
-    console.log(parsedQuery.order);
 
   const ordered = parsedQuery.order
     ? order(filtered, parsedQuery.order)
@@ -47,12 +47,15 @@ function getPredicate(op) {
   return predicate;
 }
 
-function order(input, orderOptions) {
-  const sorted = _.sortBy(input, orderOptions.field);
+function order(input, fieldOrders) {
+  const fields = fieldOrders.map(o => o.field);
+  const orders = fieldOrders.map(getSortOrder);
 
-  if(orderOptions.reverse) {
-    sorted.reverse();
-  }
+  return _.sortByOrder(input, fields, orders);
+}
 
-  return sorted;
+function getSortOrder(orderTuple) {
+  return orderTuple.order
+    ? orderTuple.order.toLowerCase()
+    : DEFAULT_SORT_ORDER;
 }
