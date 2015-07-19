@@ -34,7 +34,11 @@ order_base = "ORDER BY" _ field:identifier { return { field } }
 
 order
   = order_desc
+  / order_asc
   / order_base
+
+order_asc
+ = order:order_base _ "ASC" { return order }
 
 order_desc
   = order:order_base _ "DESC" { order.reverse = true; return order }

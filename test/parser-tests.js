@@ -37,6 +37,12 @@ test("ORDER BY", (t) => {
   t.end();
 });
 
+test("ORDER BY explicit ASC", (t) => {
+  const out = parse("SELECT f1 FROM wat ORDER BY f1 ASC");
+  t.deepEqual(out.order, { field: "f1" });
+  t.end();
+});
+
 test("ORDER BY DESC", (t) => {
   const out = parse("SELECT f1 FROM wat ORDER BY f1 DESC");
   t.deepEqual(out.order, { field: "f1", reverse: true });
