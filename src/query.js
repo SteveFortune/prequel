@@ -10,7 +10,13 @@ export default function query(parsedQuery, data) {
     ? where(mapped, parsedQuery.where)
     : mapped;
 
-  return filtered;
+    console.log(parsedQuery.order);
+
+  const ordered = parsedQuery.order
+    ? order(filtered, parsedQuery.order)
+    : filtered;
+
+  return ordered;
 }
 
 function select(target, fields) {
@@ -39,4 +45,14 @@ function getPredicate(op) {
   }
 
   return predicate;
+}
+
+function order(input, orderOptions) {
+  const sorted = _.sortBy(input, orderOptions.field);
+
+  if(orderOptions.reverse) {
+    sorted.reverse();
+  }
+
+  return sorted;
 }

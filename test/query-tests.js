@@ -40,3 +40,21 @@ test("WHERE unary predicate", (t) => {
   t.deepEqual([{ a: 1 }, { a: 3 }], result);
   t.end();
 });
+
+test("ORDER BY ascending", (t) => {
+  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
+  const q = { fields: [], source: "f", order: { field: "a" } };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 3 }, { a: 4 }, { a: 5 }], result);
+  t.end();
+});
+
+test("ORDER BY descending", (t) => {
+  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
+  const q = { fields: [], source: "f", order: { field: "a", reverse: true } };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
+  t.end();
+});

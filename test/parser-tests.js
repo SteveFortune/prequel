@@ -30,3 +30,15 @@ test("FROM", (t) => {
   t.deepEqual(out.source, "wat");
   t.end();
 });
+
+test("ORDER BY", (t) => {
+  const out = parse("SELECT f1 FROM wat ORDER BY f1");
+  t.deepEqual(out.order, { field: "f1" });
+  t.end();
+});
+
+test("ORDER BY DESC", (t) => {
+  const out = parse("SELECT f1 FROM wat ORDER BY f1 DESC");
+  t.deepEqual(out.order, { field: "f1", reverse: true });
+  t.end();
+});

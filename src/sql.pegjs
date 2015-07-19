@@ -2,11 +2,15 @@ start
   = query
 
 query
-  = select
+  = select_order
+  / select
 
 select
   = select_where
   / select_simple
+
+select_order
+  = select:select _ order:order { select.order = order; return select }
 
 select_base
   = "SELECT" _ fields:fields _ "FROM" _ source:source { return { fields, source } }
@@ -25,6 +29,15 @@ where
 
 where_condition
   = expression
+
+order_base = "ORDER BY" _ field:identifier { return { field } }
+
+order
+  = order_desc
+  / order_base
+
+order_desc
+  = order:order_base _ "DESC" { order.reverse = true; return order }
 
 // Super simplified for now
 expression
