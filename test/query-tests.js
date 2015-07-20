@@ -3,10 +3,19 @@ import query from "../src/query";
 
 test("SELECT fields", (t) => {
   const data = { f: [{ a: 1, b: 2, c: 3 }] };
-  const q = { fields: ["a", "b"], source: "f" };
+  const q = { fields: [{ name: "a" }, { name: "b" }], source: "f" };
 
   const result = query(q, data);
   t.deepEqual([{ a: 1, b: 2 }], result);
+  t.end();
+});
+
+test("SELECT AS", (t) => {
+  const data = { f: [{ a: 1, b: 2, c: 3 }] };
+  const q = { fields: [{ name: "a" }, { name: "b", as: "z" }], source: "f" };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 1, z: 2 }], result);
   t.end();
 });
 

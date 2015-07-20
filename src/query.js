@@ -8,6 +8,7 @@ export default function query(parsedQuery, data) {
 
   // TODO compose a lazily evaluated function
   const mapped = select(target, parsedQuery.fields);
+
   const filtered = parsedQuery.where
     ? where(mapped, parsedQuery.where)
     : mapped;
@@ -26,7 +27,17 @@ function select(target, fields) {
 }
 
 function selectFields(target, fields) {
-  return target.map(row => _.pick(row, fields));
+  return target.map(row => projectFields(row, fields));
+}
+
+function projectFields(row, fields) {
+  const out = {};
+  for(let field of fields) {
+    let projectedName = field.as || field.name;
+    out[projectedName] = row[field.name];
+  }
+
+  return out;
 }
 
 function selectAll(target) {

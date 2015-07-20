@@ -3,25 +3,31 @@ import parse from "../src/parser";
 
 test("SELECT one field", (t) => {
   const out = parse("SELECT f1 FROM wat");
-  t.deepEqual(out.fields, ["f1"]);
+  t.deepEqual(out.fields, [{ name: "f1" }]);
   t.end();
 });
 
 test("SELECT two fields", (t) => {
   const out = parse("SELECT f1, f2 FROM wat");
-  t.deepEqual(out.fields, ["f1", "f2"]);
+  t.deepEqual(out.fields, ["f1", "f2"].map(name => ({ name })));
   t.end();
 });
 
 test("SELECT more than two fields", (t) => {
   const out = parse("SELECT f1, f2, f3, f4 FROM wat");
-  t.deepEqual(out.fields, ["f1", "f2", "f3", "f4"]);
+  t.deepEqual(out.fields, ["f1", "f2", "f3", "f4"].map(name => ({ name })));
   t.end();
 });
 
 test("SELECT * produces empty field list", (t) => {
   const out = parse("SELECT * FROM wat");
   t.deepEqual(out.fields, []);
+  t.end();
+});
+
+test("SELECT AS", (t) => {
+  const out = parse("SELECT f1, f2 AS g FROM wat");
+  t.deepEqual(out.fields, [{ name: "f1" }, { name: "f2", as: "g" }]);
   t.end();
 });
 

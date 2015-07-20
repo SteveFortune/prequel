@@ -60,8 +60,8 @@ order_desc
 
 // Super simplified for now
 expression
-  = field:field _ op:binary_operator _ value:literal { return { field, op, value } }
-  / field:field _ op:unary_operator { return { field, op } }
+  = field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
+  / field:identifier _ op:unary_operator { return { field, op } }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="
@@ -83,7 +83,8 @@ field_and_delim
   = field:field list_delim { return field }
 
 field
-  = identifier
+  = name:identifier _ "AS" _ as:identifier { return { name, as } }
+  / name:identifier { return { name } }
 
 literal
   = int

@@ -12,7 +12,18 @@ test("SELECT a, b FROM ${rows}", (t) => {
   t.end();
 });
 
-test("SELECT a, b FROM ${rows} WHERE b < 3", (t) => {
+test("SELECT a AS x, b AS y FROM ${rows}", (t) => {
+  const rows = [
+    { a: 1, b: 2, c: 3 },
+    { a: 3, b: 4, c: 5 }
+  ];
+
+  const result = oql`SELECT a AS x, b FROM ${rows}`;
+  t.deepEqual([{ x: 1, b: 2 }, { x: 3, b: 4 }], result);
+  t.end();
+});
+
+test("SELECT a, b FROM ${rows} WHERE b <> 2", (t) => {
   const rows = [
     { a: 1, b: 2, c: 3 },
     { a: 3, b: 4, c: 5 }
