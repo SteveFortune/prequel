@@ -1,5 +1,7 @@
 # prequel
 
+[![Build](https://travis-ci.org/jwhitfieldseed/prequel.svg?branch=master)](https://travis-ci.org/jwhitfieldseed/prequel)
+
 Use SQL and tagged template strings to query JavaScript objects in style:
 
     import q from 'prequel';
