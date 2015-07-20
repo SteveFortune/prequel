@@ -37,6 +37,18 @@ test("FROM", (t) => {
   t.end();
 });
 
+test("WHERE binary condition with literal", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE f1 <> 9");
+  t.deepEqual(out.where, { field: "f1", op: "<>", value: 9 });
+  t.end();
+});
+
+test("WHERE unary condition", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE f1 IS NOT NULL");
+  t.deepEqual(out.where, { field: "f1", op: "IS NOT NULL" });
+  t.end();
+});
+
 test("ORDER BY", (t) => {
   const out = parse("SELECT f1 FROM wat ORDER BY f1");
   t.deepEqual(out.order, [{ field: "f1" }]);
