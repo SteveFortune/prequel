@@ -26,6 +26,7 @@
     "pegjs": "^0.8.0"
   },
   "devDependencies": {
+    "babel": "^5.6.23",
     "faucet": "0.0.1",
     "tape": "^4.0.1"
   }
