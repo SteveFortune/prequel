@@ -76,3 +76,15 @@ test("ORDER BY several fields", (t) => {
   ]);
   t.end();
 });
+
+test("GROUP BY one field", t => {
+  const out = parse("SELECT f1 FROM wat GROUP BY f1");
+  t.deepEqual(out.group, { fields: ["f1"] });
+  t.end();
+});
+
+test("GROUP BY several fields", t => {
+  const out = parse("SELECT f1, f2 FROM wat GROUP BY f1, f2");
+  t.deepEqual(out.group, { fields: ["f1", "f2"] });
+  t.end();
+});

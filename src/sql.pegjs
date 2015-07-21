@@ -2,9 +2,10 @@ start
   = query
 
 query
-  = select:select where:where? order:order?  {
+  = select:select where:where? group:group? order:order?  {
     if(where) select.where = where;
     if(order) select.order = order;
+    if(group) select.group = group;
     return select;
   }
 
@@ -16,6 +17,9 @@ where
 
 where_condition
   = expression
+
+group
+  = _ "GROUP BY" _ fields:identifier_list { return { fields } }
 
 order
   = _ "ORDER BY" _ order:order_tuple_list { return order }
