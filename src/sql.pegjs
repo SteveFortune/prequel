@@ -1,4 +1,4 @@
-start
+fistart
   = query
 
 query
@@ -48,7 +48,11 @@ field_delim
   = field:field list_delim { return field }
 
 field
-  = name:identifier _ "AS" _ as:identifier { return { name, as } }
+  = expr:field_expression _ "AS" _ as:identifier { expr.as = as; return expr }
+  / expr:field_expression { return expr }
+
+field_expression
+  = agg:aggregated_field { return agg }
   / name:identifier { return { name } }
 
 identifier_list
@@ -60,6 +64,16 @@ identifier_delim
 
 identifier
   = chars:[$_a-zA-Z0-9]+  { return chars.join("") }
+
+aggregated_field
+  = special_aggregated_field
+  / aggregate:aggregate_function "(" name:identifier ")" { return aggregate, name }
+
+special_aggregated_field
+  = aggregate:"COUNT" "(DISTINCT" _ name:identifier { return aggregate, name }
+
+aggregate_function
+  = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"
 
 // Super simplified for now
 expression
