@@ -50,6 +50,47 @@ test("WHERE unary predicate", (t) => {
   t.end();
 });
 
+test("GROUP BY one field", (t) => {
+  const data = { f: [{ a: 3 }, { a: 3 }, { a: 4 }] };
+  const q = { fields: [{ name: "a" }], source: "f", group: { fields: ["a"] } };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 3 }, { a: 4 }], result);
+  t.end();
+});
+
+test("SELECT a FROM x GROUP BY a, b", (t) => {
+  const rows = [
+    { a: 1, b: 1, c: 9 },
+    { a: 2, b: 1, c: 9 },
+    { a: 2, b: 2, c: 7 },
+    { a: 2, b: 2, c: 6 }
+  ];
+
+  const data = { f: rows };
+  const q = { fields: [{ name: "a" }], source: "f", group: { fields: ["a", "b"] } };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 1 }, { a: 2 }, { a: 2 }], result);
+  t.end();
+});
+
+test("SELECT a, b FROM x GROUP BY a, b", (t) => {
+  const rows = [
+    { a: 1, b: 1, c: 9 },
+    { a: 2, b: 1, c: 9 },
+    { a: 2, b: 2, c: 7 },
+    { a: 2, b: 2, c: 6 }
+  ];
+
+  const data = { f: rows };
+  const q = { fields: [{ name: "a" }, { name: "b" }], source: "f", group: { fields: ["a", "b"] } };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 1, b: 1 }, { a: 2, b: 1 }, { a: 2, b: 2 }], result);
+  t.end();
+});
+
 test("ORDER BY ascending", (t) => {
   const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
   const q = { fields: [], source: "f", order: [{ field: "a" }] };

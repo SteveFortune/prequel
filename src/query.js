@@ -4,20 +4,23 @@ import { binaryPredicates, unaryPredicates } from "./predicates";
 const DEFAULT_SORT_ORDER = "asc";
 
 export default function query(parsedQuery, data) {
-  const target = data[parsedQuery.source];
-
-  // TODO compose a lazily evaluated function
-  const mapped = select(target, parsedQuery.fields);
+  const input = data[parsedQuery.source];
 
   const filtered = parsedQuery.where
-    ? where(mapped, parsedQuery.where)
-    : mapped;
+    ? where(input, parsedQuery.where)
+    : input;
 
-  const ordered = parsedQuery.order
-    ? order(filtered, parsedQuery.order)
+  const grouped = parsedQuery.group
+    ? group(filtered, parsedQuery.fields, parsedQuery.group)
     : filtered;
 
-  return ordered;
+  const ordered = parsedQuery.order
+    ? order(grouped, parsedQuery.order)
+    : grouped;
+
+  const projected = select(ordered, parsedQuery.fields);
+
+  return projected;
 }
 
 function select(target, fields) {
@@ -33,11 +36,15 @@ function selectFields(target, fields) {
 function projectFields(row, fields) {
   const out = {};
   for(let field of fields) {
-    let projectedName = field.as || field.name;
+    let projectedName = getOutputFieldName(field);
     out[projectedName] = row[field.name];
   }
 
   return out;
+}
+
+function getOutputFieldName(field) {
+  return field.as || field.name;
 }
 
 function selectAll(target) {
@@ -56,6 +63,23 @@ function getPredicate(op) {
   }
 
   return predicate;
+}
+
+function group(input, outputFields, { fields: groupFields }) {
+  const rowGroups = _.groupBy(input, row => getGroupKey(row, groupFields));
+  return _.map(rowGroups, (rows, key) => getGroupOutputRow(key, rows, outputFields));
+}
+
+function getGroupKey(row, groupFields) {
+  return JSON.stringify(_.pick(row, groupFields));
+}
+
+function getGroupOutputRow(key, groupRows, outputFields) {
+  return outputFields.reduce((row, field) => {
+    const outputName = getOutputFieldName(field);
+    row[outputName] = groupRows[0][field.name];
+    return row;
+  }, {});
 }
 
 function order(input, fieldOrders) {
