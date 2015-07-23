@@ -105,3 +105,24 @@ test("SELECT a, COUNT(c), MAX(c) FROM ${rows} GROUP BY a, b", (t) => {
   t.deepEqual([{ a: 1, max_c: 9 }, { a: 2, max_c: 9 }], result);
   t.end();
 });
+
+test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a", (t) => {
+  const rows = [
+    { a: 1, b: 1 },
+    { a: 1, b: 2 },
+    { a: 1, b: 2 },
+    { a: 2, b: 1 },
+    { a: 3, b: 2 },
+    { a: 3, b: 3 }
+  ];
+
+  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a`;
+  const expected = [
+    { a: 1, count_b: 3, count_distinct_b: 2 },
+    { a: 2, count_b: 1, count_distinct_b: 1 },
+    { a: 3, count_b: 2, count_distinct_b: 2 }
+  ];
+
+  t.deepEqual(expected, result);
+  t.end();
+});
