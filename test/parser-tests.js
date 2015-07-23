@@ -88,3 +88,21 @@ test("GROUP BY several fields", t => {
   t.deepEqual(out.group, { fields: ["f1", "f2"] });
   t.end();
 });
+
+test("SELECT regular aggregate function", t => {
+  const out = parse("SELECT COUNT(f1) FROM wat");
+  t.deepEqual(out.fields, [{ name: "f1", aggregate: "COUNT" }]);
+  t.end();
+});
+
+test("SELECT COUNT(DISTINCT x)", t => {
+  const out = parse("SELECT COUNT(DISTINCT x) FROM wat");
+  t.deepEqual(out.fields, [{ name: "x", aggregate: "COUNT_DISTINCT" }]);
+  t.end();
+});
+
+test("SELECT mixed fields and aggregate fields", t => {
+  const out = parse("SELECT f1, FIRST(f2), COUNT(DISTINCT f3) FROM wat");
+  t.deepEqual(out.fields, [{ name: "f1" }, { name: "f2", aggregate: "FIRST" }, { name: "f3", aggregate: "COUNT_DISTINCT" }]);
+  t.end();
+});

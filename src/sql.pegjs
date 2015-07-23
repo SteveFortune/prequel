@@ -1,4 +1,4 @@
-fistart
+start
   = query
 
 query
@@ -67,10 +67,10 @@ identifier
 
 aggregated_field
   = special_aggregated_field
-  / aggregate:aggregate_function "(" name:identifier ")" { return aggregate, name }
+  / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, name } }
 
 special_aggregated_field
-  = aggregate:"COUNT" "(DISTINCT" _ name:identifier { return aggregate, name }
+  = "COUNT(DISTINCT" _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", name } }
 
 aggregate_function
   = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"
