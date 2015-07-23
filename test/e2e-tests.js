@@ -1,3 +1,4 @@
+/* eslint camelcase:[0] */
 import test from "tape";
 import oql from "../";
 
@@ -89,5 +90,18 @@ test("SELECT a FROM ${rows} GROUP BY a, b", (t) => {
 
   const result = oql`SELECT a FROM ${rows} GROUP BY a, b`;
   t.deepEqual([{ a: 1 }, { a: 2 }, { a: 2 } ], result);
+  t.end();
+});
+
+test("SELECT a, COUNT(c), MAX(c) FROM ${rows} GROUP BY a, b", (t) => {
+  const rows = [
+    { a: 1, b: 1, c: 9 },
+    { a: 2, b: 1, c: 9 },
+    { a: 2, b: 2, c: 7 },
+    { a: 2, b: 2, c: 6 }
+  ];
+
+  const result = oql`SELECT a, MAX(c) FROM ${rows} GROUP BY a`;
+  t.deepEqual([{ a: 1, max_c: 9 }, { a: 2, max_c: 9 }], result);
   t.end();
 });

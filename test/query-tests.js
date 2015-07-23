@@ -1,3 +1,4 @@
+/* eslint camelcase:[0] */
 import test from "tape";
 import query from "../src/query";
 
@@ -50,6 +51,33 @@ test("WHERE unary predicate", (t) => {
   t.end();
 });
 
+test("ORDER BY ascending", (t) => {
+  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
+  const q = { fields: [], source: "f", order: [{ field: "a" }] };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 3 }, { a: 4 }, { a: 5 }], result);
+  t.end();
+});
+
+test("ORDER BY descending", (t) => {
+  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
+  const q = { fields: [], source: "f", order: [{ field: "a", order: "DESC" }] };
+
+  const result = query(q, data);
+  t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
+  t.end();
+});
+
+test("ORDER BY several fields", (t) => {
+  const data = { f: [{ a: 1, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 2 }] };
+  const q = { fields: [], source: "f", order: [{ field: "a", order: "DESC" }, { field: "b" }] };
+
+  const result = query(q, data);
+  t.deepEqual([2, 1, 2], result.map(r => r.b));
+  t.end();
+});
+
 test("GROUP BY one field", (t) => {
   const data = { f: [{ a: 3 }, { a: 3 }, { a: 4 }] };
   const q = { fields: [{ name: "a" }], source: "f", group: { fields: ["a"] } };
@@ -91,29 +119,34 @@ test("SELECT a, b FROM x GROUP BY a, b", (t) => {
   t.end();
 });
 
-test("ORDER BY ascending", (t) => {
-  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
-  const q = { fields: [], source: "f", order: [{ field: "a" }] };
+test("SELECT COUNT(b) FROM x GROUP BY a", (t) => {
+  const rows = [
+    { a: 1, b: 1 },
+    { a: 2, b: 1 },
+    { a: 2, b: 2 },
+    { a: 2, b: 3 }
+  ];
+
+  const data = { f: rows };
+  const q = { fields: [{ name: "b", aggregate: "COUNT" }], source: "f", group: { fields: ["a"] } };
 
   const result = query(q, data);
-  t.deepEqual([{ a: 3 }, { a: 4 }, { a: 5 }], result);
+  t.deepEqual([{ count_b: 1 }, { count_b: 3 }], result);
   t.end();
 });
 
-test("ORDER BY descending", (t) => {
-  const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
-  const q = { fields: [], source: "f", order: [{ field: "a", order: "DESC" }] };
+test("SELECT a, MAX(b) FROM x GROUP BY a", (t) => {
+  const rows = [
+    { a: 1, b: 1 },
+    { a: 2, b: 1 },
+    { a: 2, b: 2 },
+    { a: 2, b: 3 }
+  ];
+
+  const data = { f: rows };
+  const q = { fields: [{ name: "a" }, { name: "b", aggregate: "MAX" }], source: "f", group: { fields: ["a"] } };
 
   const result = query(q, data);
-  t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
-  t.end();
-});
-
-test("ORDER BY several fields", (t) => {
-  const data = { f: [{ a: 1, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 2 }] };
-  const q = { fields: [], source: "f", order: [{ field: "a", order: "DESC" }, { field: "b" }] };
-
-  const result = query(q, data);
-  t.deepEqual([2, 1, 2], result.map(r => r.b));
+  t.deepEqual([{ a: 1, max_b: 1 }, { a: 2, max_b: 3 }], result);
   t.end();
 });
