@@ -2,10 +2,11 @@ start
   = query
 
 query
-  = select:select where:where? group:group? order:order?  {
+  = select:select where:where? group:group? order:order? limit:limit? {
     if(where) select.where = where;
-    if(order) select.order = order;
     if(group) select.group = group;
+    if(order) select.order = order;
+    if(limit) select.limit = limit;
     return select;
   }
 
@@ -38,6 +39,13 @@ order_tuple
 order_dir
   = "ASC"
   / "DESC"
+
+limit
+  = _ "LIMIT" _ limit:limit_parameters { return limit }
+
+limit_parameters
+  = offset:int _ count:int { return { offset: +offset, count: +count } }
+  / count:int { return { count: +count } }
 
 field_list
   = head:field_delim tail:field_list { return [head].concat(tail) }

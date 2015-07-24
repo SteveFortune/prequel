@@ -139,3 +139,43 @@ test("SELECT COUNT(DISTINCT a), b FROM ${rows}", (t) => {
   t.deepEqual([{ count_distinct_a: 3, b: 1 }], result);
   t.end();
 });
+
+test("SELECT * FROM ${rows} LIMIT 2 2", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const result = oql`SELECT * FROM ${rows} LIMIT 2 2`;
+  t.deepEqual([3, 4], result.map(r => (r.a)));
+  t.end();
+});
+
+test("SELECT * FROM ${rows} LIMIT 4 ORDER BY a DESC", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const result = oql`SELECT * FROM ${rows} ORDER BY a DESC LIMIT 4`;
+  t.deepEqual([5, 4, 3, 2], result.map(r => (r.a)));
+  t.end();
+});
+
+test("SELECT * FROM ${rows} LIMIT 4 ORDER BY a DESC", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const result = oql`SELECT * FROM ${rows} ORDER BY a DESC LIMIT 4`;
+  t.deepEqual([5, 4, 3, 2], result.map(r => (r.a)));
+  t.end();
+});
+
+test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1 1", (t) => {
+  const rows = [
+    { a: 1, b: 1 },
+    { a: 1, b: 2 },
+    { a: 1, b: 2 },
+    { a: 2, b: 1 },
+    { a: 3, b: 2 },
+    { a: 3, b: 3 }
+  ];
+
+  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1 1`;
+  const expected = [
+    { a: 2, count_b: 1, count_distinct_b: 1 }
+  ];
+
+  t.deepEqual(expected, result);
+  t.end();
+});

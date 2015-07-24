@@ -106,3 +106,15 @@ test("SELECT mixed fields and aggregate fields", t => {
   t.deepEqual(out.fields, [{ name: "f1" }, { name: "f2", aggregate: "FIRST" }, { name: "f3", aggregate: "COUNT_DISTINCT" }]);
   t.end();
 });
+
+test("LIMIT count", t => {
+  const out = parse("SELECT * FROM x LIMIT 1");
+  t.deepEqual(out.limit, { count: 1 });
+  t.end();
+});
+
+test("LIMIT offset count", t => {
+  const out = parse("SELECT * FROM x LIMIT 5 10");
+  t.deepEqual(out.limit, { offset: 5, count: 10 });
+  t.end();
+});

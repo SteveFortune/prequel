@@ -10,7 +10,8 @@ export default function executeQuery(parsedQuery, data) {
   const filtered = where(input, parsedQuery);
   const aggregated = group(filtered, parsedQuery);
   const ordered = order(aggregated, parsedQuery);
-  const projected = select(ordered, parsedQuery);
+  const limited = limit(ordered, parsedQuery);
+  const projected = select(limited, parsedQuery);
 
   return projected;
 }
@@ -136,4 +137,14 @@ function getSortOrder(orderTuple) {
   return orderTuple.order
     ? orderTuple.order.toLowerCase()
     : DEFAULT_SORT_ORDER;
+}
+
+function limit(input, { limit: limitParams }) {
+  if(limitParams) {
+    const offset = limitParams.offset || 0;
+
+    return input.slice(offset, offset + limitParams.count);
+  } else {
+    return input;
+  }
 }

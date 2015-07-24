@@ -172,3 +172,48 @@ test("SELECT AVG(a), b FROM x", (t) => {
   t.deepEqual([{ avg_a: 3, b: 2 }], result);
   t.end();
 });
+
+test("SELECT AVG(a), b FROM x", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a, b: 2 * a }));
+  const data = { f: rows };
+
+  const q = { fields: [{ name: "a", aggregate: "AVG" }, { name: "b" }], source: "f" };
+  const result = query(q, data);
+
+  t.deepEqual([{ avg_a: 3, b: 2 }], result);
+  t.end();
+});
+
+test("SELECT * FROM x LIMIT 3", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const data = { f: rows };
+
+  const q = { fields: [], limit: { count: 3 }, source: "f" };
+  const result = query(q, data);
+
+  t.equal(3, result.length);
+  t.end();
+});
+
+test("SELECT * FROM x LIMIT 0", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const data = { f: rows };
+
+  const q = { fields: [], limit: { count: 0 }, source: "f" };
+  const result = query(q, data);
+
+  t.equal(0, result.length);
+  t.end();
+});
+
+test("SELECT * FROM x LIMIT 1, 3", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const data = { f: rows };
+
+  const q = { fields: [], limit: { offset: 1, count: 3 }, source: "f" };
+  const result = query(q, data);
+
+  t.equal(3, result.length);
+  t.equal(2, result[0].a);
+  t.end();
+});
