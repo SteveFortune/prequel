@@ -7,7 +7,7 @@ const DEFAULT_SORT_ORDER = "asc";
 export default function executeQuery(parsedQuery, data) {
   const input = data[parsedQuery.source];
 
-  const filtered = where(input, parsedQuery);
+  const filtered = where(input, parsedQuery, data);
   const aggregated = group(filtered, parsedQuery);
   const ordered = order(aggregated, parsedQuery);
   const limited = limit(ordered, parsedQuery);
@@ -53,13 +53,33 @@ function selectAll(target) {
   return target;
 }
 
-function where(input, { where: condition }) {
+function where(input, { where: condition }, data={}) {
   if(condition) {
-    const predicate = getPredicate(condition.op);
-    return input.filter((row) => predicate(row[condition.field], condition.value));
+    return whereCondition(input, condition, data);
   } else {
     return input;
   }
+}
+
+function whereCondition(input, condition, data) {
+  if(condition.op) {
+    return whereOperator(input, condition);
+  } else if(condition.reference) {
+    const referencedDatum = data[condition.reference];
+    return whereReference(input, referencedDatum);
+  } else {
+    throw new Error(`Invalid WHERE condition: ${JSON.stringify(condition)}`);
+  }
+}
+
+function whereOperator(input, condition) {
+  const predicate = getPredicate(condition.op);
+  return input.filter((row) => predicate(row[condition.field], condition.value));
+}
+
+function whereReference(input, referenced) {
+  const predicate = _.isFunction(referenced) ? referenced : () => referenced;
+  return input.filter(predicate);
 }
 
 function getPredicate(op) {

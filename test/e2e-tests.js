@@ -24,7 +24,7 @@ test("SELECT a AS x, b AS y FROM ${rows}", (t) => {
   t.end();
 });
 
-test("SELECT a, b FROM ${rows} WHERE b <> 2", (t) => {
+test("SELECT a, b FROM ${rows} WHERE b < 3", (t) => {
   const rows = [
     { a: 1, b: 2, c: 3 },
     { a: 3, b: 4, c: 5 }
@@ -32,6 +32,26 @@ test("SELECT a, b FROM ${rows} WHERE b <> 2", (t) => {
 
   const result = oql`SELECT a, b FROM ${rows} WHERE b < 3`;
   t.deepEqual([{ a: 1, b: 2 }], result);
+  t.end();
+});
+
+test("SELECT * FROM ${rows} WHERE ${row => row.a + row.b === row.c}", (t) => {
+  const rows = [
+    { a: 1, b: 2, c: 3 },
+    { a: 3, b: 4, c: 5 },
+    { a: 6, b: 7, c: 13 }
+  ];
+
+  const result = oql`SELECT * FROM ${rows} WHERE ${row => row.a + row.b === row.c}`;
+  t.deepEqual([rows[0], rows[2]], result);
+  t.end();
+});
+
+test("SELECT * FROM ${rows} WHERE ${(row, n) => n % 2}", (t) => {
+  const rows = [1, 2, 3, 4, 5, 6].map(a => ({ a }));
+
+  const result = oql`SELECT * FROM ${rows} WHERE ${(row, n) => n % 2}`;
+  t.deepEqual([2, 4, 6], result.map(r => r.a));
   t.end();
 });
 

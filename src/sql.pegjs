@@ -87,6 +87,7 @@ aggregate_function
 expression
   = field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
   / field:identifier _ op:unary_operator { return { field, op } }
+  / reference:identifier { return { reference } } // A reference to an interpolated or provided value
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="

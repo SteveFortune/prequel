@@ -49,6 +49,12 @@ test("WHERE unary condition", (t) => {
   t.end();
 });
 
+test("WHERE reference", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE $refName");
+  t.deepEqual(out.where, { reference: "$refName"});
+  t.end();
+});
+
 test("ORDER BY", (t) => {
   const out = parse("SELECT f1 FROM wat ORDER BY f1");
   t.deepEqual(out.order, [{ field: "f1" }]);

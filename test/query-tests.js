@@ -51,6 +51,48 @@ test("WHERE unary predicate", (t) => {
   t.end();
 });
 
+test("WHERE referenced falsy value", (t) => {
+  const data = { f: [{ a: 1 }, { a: 3 }], $1: null };
+
+  const condition = { reference: "$1" };
+  const q = { where: condition, fields: [], source: "f" };
+
+  const result = query(q, data);
+  t.deepEqual([], result);
+  t.end();
+});
+
+test("WHERE referenced truthy value", (t) => {
+  const data = { f: [{ a: 1 }, { a: 3 }], $1: 1 };
+
+  const condition = { reference: "$1" };
+  const q = { where: condition, fields: [], source: "f" };
+
+  const result = query(q, data);
+  t.deepEqual(data.f, result);
+  t.end();
+});
+
+test("WHERE referenced function is called with each row and row number", (t) => {
+  // check row number values
+  let seenRows = [];
+  const predicate = (row, n) => {
+    seenRows.push(n);
+    return row.a % 2;
+  };
+
+  const data = { f: [1, 2, 3, 4, 5, 6].map(a => ({ a })), $1: predicate };
+
+  const condition = { reference: "$1" };
+  const q = { where: condition, fields: [], source: "f" };
+
+  const result = query(q, data);
+  t.deepEqual([1, 3, 5], result.map(r => r.a));
+  t.deepEqual([0, 1, 2, 3, 4, 5], seenRows);
+
+  t.end();
+});
+
 test("ORDER BY ascending", (t) => {
   const data = { f: [{ a: 5 }, { a: 3 }, { a: 4 }] };
   const q = { fields: [], source: "f", order: [{ field: "a" }] };
