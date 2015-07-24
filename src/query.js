@@ -4,27 +4,18 @@ import getAggregateFunction from "./aggregates";
 
 const DEFAULT_SORT_ORDER = "asc";
 
-export default function query(parsedQuery, data) {
+export default function executeQuery(parsedQuery, data) {
   const input = data[parsedQuery.source];
 
-  const filtered = parsedQuery.where
-    ? where(input, parsedQuery.where)
-    : input;
-
-  const grouped = parsedQuery.group
-    ? group(filtered, parsedQuery.fields, parsedQuery.group)
-    : filtered;
-
-  const ordered = parsedQuery.order
-    ? order(grouped, parsedQuery.order)
-    : grouped;
-
-  const projected = select(ordered, parsedQuery.fields);
+  const filtered = where(input, parsedQuery);
+  const aggregated = group(filtered, parsedQuery);
+  const ordered = order(aggregated, parsedQuery);
+  const projected = select(ordered, parsedQuery);
 
   return projected;
 }
 
-function select(target, fields) {
+function select(target, { fields }) {
   return fields.length === 0
     ? selectAll(target)
     : selectFields(target, fields);
@@ -61,9 +52,13 @@ function selectAll(target) {
   return target;
 }
 
-function where(input, condition) {
-  const predicate = getPredicate(condition.op);
-  return input.filter((row) => predicate(row[condition.field], condition.value));
+function where(input, { where: condition }) {
+  if(condition) {
+    const predicate = getPredicate(condition.op);
+    return input.filter((row) => predicate(row[condition.field], condition.value));
+  } else {
+    return input;
+  }
 }
 
 function getPredicate(op) {
@@ -75,16 +70,30 @@ function getPredicate(op) {
   return predicate;
 }
 
-function group(input, outputFields, { fields: groupFields }) {
-  const rowGroups = _.groupBy(input, row => getGroupKey(row, groupFields));
-  return _.map(rowGroups, (rows, key) => getGroupOutputRow(key, rows, outputFields));
+function group(input, query) {
+  if(query.group) {
+    return aggregateByGroup(input, query);
+  } else if(query.fields.some(field => field.aggregate)) {
+    return aggregateOverall(input, query);
+  } else {
+    return input;
+  }
+}
+
+function aggregateByGroup(input, { fields: outputFields, group: groupBy }) {
+  const rowGroups = _.groupBy(input, row => getGroupKey(row, groupBy.fields));
+  return _.map(rowGroups, rows => getGroupOutputRow(rows, outputFields));
+}
+
+function aggregateOverall(input, { fields }) {
+  return [getGroupOutputRow(input, fields)];
 }
 
 function getGroupKey(row, groupFields) {
   return JSON.stringify(_.pick(row, groupFields));
 }
 
-function getGroupOutputRow(key, groupRows, outputFields) {
+function getGroupOutputRow(groupRows, outputFields) {
   return outputFields.reduce((row, field) => {
     const outputName = getOutputFieldName(field);
 
@@ -112,11 +121,15 @@ function getDefaultGroupValue(groupRows, field) {
   return groupRows[0][field.name];
 }
 
-function order(input, fieldOrders) {
-  const fields = fieldOrders.map(o => o.field);
-  const orders = fieldOrders.map(getSortOrder);
+function order(input, { order: fieldOrders }) {
+  if(fieldOrders) {
+    const fields = fieldOrders.map(o => o.field);
+    const orders = fieldOrders.map(getSortOrder);
 
-  return _.sortByOrder(input, fields, orders);
+    return _.sortByOrder(input, fields, orders);
+  } else {
+    return input;
+  }
 }
 
 function getSortOrder(orderTuple) {

@@ -150,3 +150,25 @@ test("SELECT a, MAX(b) FROM x GROUP BY a", (t) => {
   t.deepEqual([{ a: 1, max_b: 1 }, { a: 2, max_b: 3 }], result);
   t.end();
 });
+
+test("SELECT AVG(a) FROM x", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const data = { f: rows };
+
+  const q = { fields: [{ name: "a", aggregate: "AVG" }], source: "f" };
+  const result = query(q, data);
+
+  t.deepEqual([{ avg_a: 3 }], result);
+  t.end();
+});
+
+test("SELECT AVG(a), b FROM x", (t) => {
+  const rows = [1, 2, 3, 4, 5].map(a => ({ a, b: 2 * a }));
+  const data = { f: rows };
+
+  const q = { fields: [{ name: "a", aggregate: "AVG" }, { name: "b" }], source: "f" };
+  const result = query(q, data);
+
+  t.deepEqual([{ avg_a: 3, b: 2 }], result);
+  t.end();
+});

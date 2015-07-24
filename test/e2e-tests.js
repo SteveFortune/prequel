@@ -126,3 +126,16 @@ test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a", (t) => {
   t.deepEqual(expected, result);
   t.end();
 });
+
+test("SELECT COUNT(DISTINCT a), b FROM ${rows}", (t) => {
+  const rows = [
+    { a: 1, b: 1 },
+    { a: 2, b: 2 },
+    { a: 2, b: 3 },
+    { a: 4, b: 4 }
+  ];
+
+  const result = oql`SELECT COUNT(DISTINCT a), b FROM ${rows}`;
+  t.deepEqual([{ count_distinct_a: 3, b: 1 }], result);
+  t.end();
+});
