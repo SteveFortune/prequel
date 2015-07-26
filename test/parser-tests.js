@@ -81,22 +81,18 @@ test("AND has higher precedence than OR", (t) => {
   t.end();
 });
 
-// TODO WIP here
-// Need to add unrolled "cascade recursion" to remaininng expression types to fix
-//  LHS of binary and unary operator expressions.
+test("Parentheses have higher precendence than AND", (t) => {
+  const out = parse("SELECT * FROM wat WHERE (f1 = 1 OR f2 > 2) AND f3 IS NOT NULL");
 
-// test("Parentheses have higher precendence than AND", (t) => {
-//   const out = parse("SELECT f1 FROM wat WHERE (f1 = 1 OR f2 > 2) AND f3 IS NOT NULL");
-//
-//   const e1 = { field: "f1", op: "=", value: 1 };
-//   const e2 = { field: "f2", op: ">", value: 2 };
-//   const e3 = { field: "f3", op: "IS NOT NULL" };
-//
-//   const expected = { op: "AND", lhs: { op: "OR", lhs: e1, rhs: e2 }, rhs: e3 };
-//
-//   t.deepEqual(out.where, expected);
-//   t.end();
-// });
+  const e1 = { field: "f1", op: "=", value: 1 };
+  const e2 = { field: "f2", op: ">", value: 2 };
+  const e3 = { field: "f3", op: "IS NOT NULL" };
+
+  const expected = { op: "AND", lhs: { op: "OR", lhs: e1, rhs: e2 }, rhs: e3 };
+
+  t.deepEqual(out.where, expected);
+  t.end();
+});
 
 test("WHERE reference", (t) => {
   const out = parse("SELECT f1 FROM wat WHERE $refName");

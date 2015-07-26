@@ -5,7 +5,6 @@
     if(!rest) return first;
 
     return rest.reduce(function(lhs, curr) {
-      // return Object.assign(curr, { lhs })
       return { op: curr.op, lhs, rhs: curr.rhs }
     }, first);
   }
@@ -108,12 +107,13 @@ or_expression
 and_expression
   = first:base_expression rest:(_ op:and_operator _ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
 
-// TODO WIP here:
-// Unroll remaining expression types to allow all expression types as LHS
-base_expression
-  = field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
-  / field:identifier _ op:unary_operator { return { field, op } }
+operator_expression
+  = field:identifier _ op:unary_operator { return { field, op } }
+  / field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
   / reference:identifier { return { reference } }
+
+base_expression
+  = operator_expression
   / lp expr:expression rp { return expr }
 
 binary_operator
@@ -123,7 +123,6 @@ unary_operator
   = "IS NULL"
   / "IS NOT NULL"
 
-// tmp includes spaces to make expression rules simpler
 and_operator
   = "AND" / "&&"
 
@@ -145,14 +144,15 @@ list_delim
 
 int = digits:[0-9]+ { return parseInt(digits.join("")) }
 
-string = sq chars:[^']* sq { return chars.join("") }
-string = dq chars:[^"]* dq { return chars.join("") }
+string
+  = sq chars:[^']* sq { return chars.join("") }
+  / dq chars:[^"]* dq { return chars.join("") }
 
 sq = "'"
 dq = '"'
 
-lp = _? "(" _? { return "(" }
-rp = _? ")" _? { return ")"}
+lp = "(" { return "(" }
+rp = ")" { return ")"}
 
 _
   = [ ]+
