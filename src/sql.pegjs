@@ -1,3 +1,16 @@
+{
+  // Roll up unrolled "recursive" rules for left-associative expressions
+  // HT http://stackoverflow.com/a/30798758/2806996
+  var reduce = function(first, rest) {
+    if(!rest) return first;
+
+    return rest.reduce(function(lhs, curr) {
+      // return Object.assign(curr, { lhs })
+      return { op: curr.op, lhs, rhs: curr.rhs }
+    }, first);
+  }
+}
+
 start
   = query
 
@@ -83,11 +96,25 @@ special_aggregated_field
 aggregate_function
   = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"
 
-// Super simplified for now
+// Expressions use unrolled recursion
+// HT http://stackoverflow.com/a/30798758/2806996
+
 expression
+  = or_expression
+
+or_expression
+  = first:and_expression rest:(_ op:or_operator _ rhs:and_expression { return { op, rhs }  })* { return reduce(first, rest) }
+
+and_expression
+  = first:base_expression rest:(_ op:and_operator _ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
+
+// TODO WIP here:
+// Unroll remaining expression types to allow all expression types as LHS
+base_expression
   = field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
   / field:identifier _ op:unary_operator { return { field, op } }
-  / reference:identifier { return { reference } } // A reference to an interpolated or provided value
+  / reference:identifier { return { reference } }
+  / lp expr:expression rp { return expr }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="
@@ -95,6 +122,16 @@ binary_operator
 unary_operator
   = "IS NULL"
   / "IS NOT NULL"
+
+// tmp includes spaces to make expression rules simpler
+and_operator
+  = "AND" / "&&"
+
+or_operator
+  = "OR" / "||"
+
+unary_boolean_operator
+  = "NOT" / "!"
 
 literal
   = int
@@ -113,6 +150,9 @@ string = dq chars:[^"]* dq { return chars.join("") }
 
 sq = "'"
 dq = '"'
+
+lp = _? "(" _? { return "(" }
+rp = _? ")" _? { return ")"}
 
 _
   = [ ]+

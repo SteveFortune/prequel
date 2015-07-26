@@ -49,6 +49,55 @@ test("WHERE unary condition", (t) => {
   t.end();
 });
 
+test("WHERE boolean condition", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE f1 = 10 AND f2 > 5");
+  t.deepEqual(out.where, { op: "AND", lhs: { field: "f1", op: "=", value: 10 }, rhs: { field: "f2", op: ">", value: 5 } });
+  t.end();
+});
+
+test("Boolean conditions are left-associative", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE f1 = 1 AND f2 > 2 AND f3 IS NOT NULL");
+
+  const e1 = { field: "f1", op: "=", value: 1 };
+  const e2 = { field: "f2", op: ">", value: 2 };
+  const e3 = { field: "f3", op: "IS NOT NULL" };
+
+  const expected = { op: "AND", lhs: { op: "AND", lhs: e1, rhs: e2 }, rhs: e3 };
+
+  t.deepEqual(out.where, expected);
+  t.end();
+});
+
+test("AND has higher precedence than OR", (t) => {
+  const out = parse("SELECT f1 FROM wat WHERE f1 = 1 OR f2 > 2 AND f3 IS NOT NULL");
+
+  const e1 = { field: "f1", op: "=", value: 1 };
+  const e2 = { field: "f2", op: ">", value: 2 };
+  const e3 = { field: "f3", op: "IS NOT NULL" };
+
+  const expected = { op: "OR", lhs: e1, rhs: { op: "AND", lhs: e2, rhs: e3 } };
+
+  t.deepEqual(out.where, expected);
+  t.end();
+});
+
+// TODO WIP here
+// Need to add unrolled "cascade recursion" to remaininng expression types to fix
+//  LHS of binary and unary operator expressions.
+
+// test("Parentheses have higher precendence than AND", (t) => {
+//   const out = parse("SELECT f1 FROM wat WHERE (f1 = 1 OR f2 > 2) AND f3 IS NOT NULL");
+//
+//   const e1 = { field: "f1", op: "=", value: 1 };
+//   const e2 = { field: "f2", op: ">", value: 2 };
+//   const e3 = { field: "f3", op: "IS NOT NULL" };
+//
+//   const expected = { op: "AND", lhs: { op: "OR", lhs: e1, rhs: e2 }, rhs: e3 };
+//
+//   t.deepEqual(out.where, expected);
+//   t.end();
+// });
+
 test("WHERE reference", (t) => {
   const out = parse("SELECT f1 FROM wat WHERE $refName");
   t.deepEqual(out.where, { reference: "$refName"});
