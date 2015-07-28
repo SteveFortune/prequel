@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { binaryPredicates, unaryPredicates } from "./predicates";
+import { binaryPredicates, unaryPredicates } from "./operators";
 import getAggregateFunction from "./aggregates";
 
 const DEFAULT_SORT_ORDER = "asc";

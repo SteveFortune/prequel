@@ -1,5 +1,7 @@
+/* eslint dot-notation: [0] */
+
 import test from "tape";
-import { binaryPredicates as binary, unaryPredicates as unary } from "../src/predicates";
+import { binaryPredicates as binary, unaryPredicates as unary, binaryBoolean, unaryBoolean } from "../src/operators";
 
 test("=", (t) => {
   const eq = binary["="];
@@ -72,5 +74,55 @@ test("IS NOT NULL", (t) => {
   t.true(isNotNull(false));
   t.true(isNotNull(""));
   t.true(isNotNull([]));
+  t.end();
+});
+
+test("AND", (t) => {
+  const and = binaryBoolean["AND"];
+  t.true(and(1, 1));
+  t.false(and(1, 0));
+  t.false(and(0, 1));
+  t.false(and(0, 0));
+  t.end();
+});
+
+test("&& is the same as AND", (t) => {
+  const ampAmp = binaryBoolean["&&"];
+  t.true(ampAmp(1, 1));
+  t.false(ampAmp(1, 0));
+  t.false(ampAmp(0, 1));
+  t.false(ampAmp(0, 0));
+  t.end();
+});
+
+test("OR", (t) => {
+  const or = binaryBoolean["OR"];
+  t.true(or(1, 1));
+  t.true(or(1, 0));
+  t.true(or(0, 1));
+  t.false(or(0, 0));
+  t.end();
+});
+
+test("|| is the same as OR", (t) => {
+  const pipePipe = binaryBoolean["||"];
+  t.true(pipePipe(1, 1));
+  t.true(pipePipe(1, 0));
+  t.true(pipePipe(0, 1));
+  t.false(pipePipe(0, 0));
+  t.end();
+});
+
+test("NOT", (t) => {
+  const not = unaryBoolean["NOT"];
+  t.true(not(0));
+  t.false(not(1));
+  t.end();
+});
+
+test("! is the same as NOT", (t) => {
+  const bang = unaryBoolean["!"];
+  t.true(bang(0));
+  t.false(bang(1));
   t.end();
 });
