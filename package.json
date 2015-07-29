@@ -4,7 +4,8 @@
   "description": "Query JavaScript objects with SQL",
   "main": "index.js",
   "scripts": {
-    "test": "babel-node $(which tape) ./test/*.js | faucet"
+    "test": "babel-node $(which tape) ./test/*.js | faucet",
+    "coverage": "istanbul cover babel-node ./test/e2e-tests.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "pegjs": "^0.8.0"
   },
   "devDependencies": {
+    "istanbul": "^0.3.17",
     "babel": "^5.6.23",
     "faucet": "0.0.1",
     "tape": "^4.0.1"
