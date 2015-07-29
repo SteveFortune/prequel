@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { binaryPredicates, unaryPredicates } from "./operators";
+import { operators, operatorTypes } from "./operators";
 import getAggregateFunction from "./aggregates";
 
 const DEFAULT_SORT_ORDER = "asc";
@@ -55,40 +55,35 @@ function selectAll(target) {
 
 function where(input, { where: condition }, data={}) {
   if(condition) {
-    return whereCondition(input, condition, data);
+    return evaluateCondition(input, condition, data);
   } else {
     return input;
   }
 }
 
-function whereCondition(input, condition, data) {
+function evaluateCondition(input, condition, data) {
   if(condition.op) {
-    return whereOperator(input, condition);
+    return evaluateOperatorPredicate(input, condition, data);
   } else if(condition.reference) {
     const referencedDatum = data[condition.reference];
-    return whereReference(input, referencedDatum);
+    return evaluateReferencePredicate(input, referencedDatum);
   } else {
     throw new Error(`Invalid WHERE condition: ${JSON.stringify(condition)}`);
   }
 }
 
-function whereOperator(input, condition) {
-  const predicate = getPredicate(condition.op);
+function evaluateOperatorPredicate(input, condition, data) {
+  const [predicate, type] = getOperator(condition.op);
   return input.filter((row) => predicate(row[condition.field], condition.value));
 }
 
-function whereReference(input, referenced) {
+function evaluateReferencePredicate(input, referenced) {
   const predicate = _.isFunction(referenced) ? referenced : () => referenced;
   return input.filter(predicate);
 }
 
-function getPredicate(op) {
-  const predicate = binaryPredicates[op] || unaryPredicates[op];
-  if(!predicate) {
-    throw new Error(`Unrecognised operation: ${op}`);
-  }
-
-  return predicate;
+function getOperator(op) {
+  return operators[op];
 }
 
 function group(input, query) {
