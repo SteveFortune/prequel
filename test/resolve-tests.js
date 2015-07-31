@@ -1,4 +1,5 @@
 import test from "tape";
+import _ from "lodash";
 import makeResolve from "../src/resolve";
 
 const fields = [
@@ -17,10 +18,12 @@ const data = {
 
 test("resolve precendence", (t) => {
   const resolve = makeResolve({ fields }, data);
-  t.equal(resolve("a"), fields[0]);
-  t.equal(resolve("b"), fields[1]);
-  t.equal(resolve("c"), fields[2]);
-  t.equal(resolve("d"), fields[2]);
-  t.equal(resolve("e"), data.e);
+  const row = { a: "A", b: "B", c: "C" };
+
+  t.equal(resolve("a", row), "A");
+  t.equal(resolve("b", row), "B");
+  t.equal(resolve("c", row), "C");
+  t.equal(resolve("d", row), "C");
+  t.equal(resolve("e", row), "datum e");
   t.end();
 });
