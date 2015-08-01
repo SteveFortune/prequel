@@ -1,18 +1,11 @@
 /* eslint dot-notation: [0] */
-
 import test from "tape";
-import { operators, types } from "../src/operators";
+import operators from "../src/operators";
 
-const {
-  comparisonBinary: cb,
-  comparisonUnary: cu,
-  booleanBinary: bb,
-  booleanUnary: bu
-} = types;
+console.log(operators);
 
 test("=", (t) => {
-  const [eq, type] = operators["="];
-  t.equal(type, cb);
+  const eq = operators["="];
 
   t.true(eq("test", "test"));
   t.false(eq(undefined, null));
@@ -20,8 +13,7 @@ test("=", (t) => {
 });
 
 test("!=", (t) => {
-  const [ne, type] = operators["!="];
-  t.equal(type, cb);
+  const ne = operators["!="];
 
   t.false(ne("test", "test"));
   t.true(ne(undefined, null));
@@ -29,10 +21,8 @@ test("!=", (t) => {
 });
 
 test("<> is the same as !=", (t) => {
-  const [ne, type] = operators["!="];
-  const [ne2, type2] = operators["<>"];
-  t.equal(type, cb);
-  t.equal(type2, cb);
+  const ne = operators["!="];
+  const ne2 = operators["<>"];
 
   t.equal(ne("test", "test"), ne2("test", "test"));
   t.equal(ne(undefined, null), ne2(undefined, null));
@@ -40,8 +30,7 @@ test("<> is the same as !=", (t) => {
 });
 
 test(">", (t) => {
-  const [gt, type] = operators[">"];
-  t.equal(type, cb);
+  const gt = operators[">"];
 
   t.true(gt(2, 1));
   t.false(gt(1, 1));
@@ -49,8 +38,7 @@ test(">", (t) => {
 });
 
 test(">=", (t) => {
-  const [gte, type] = operators[">="];
-  t.equal(type, cb);
+  const gte = operators[">="];
 
   t.true(gte(2, 1));
   t.true(gte(1, 1));
@@ -58,8 +46,7 @@ test(">=", (t) => {
 });
 
 test("<", (t) => {
-  const [lt, type] = operators["<"];
-  t.equal(type, cb);
+  const lt = operators["<"];
 
   t.true(lt(1, 2));
   t.false(lt(1, 1));
@@ -67,8 +54,7 @@ test("<", (t) => {
 });
 
 test("<=", (t) => {
-  const [lte, type] = operators["<="];
-  t.equal(type, cb);
+  const lte = operators["<="];
 
   t.true(lte(1, 2));
   t.true(lte(1, 1));
@@ -76,8 +62,7 @@ test("<=", (t) => {
 });
 
 test("IS NULL", (t) => {
-  const [isNull, type] = operators["IS NULL"];
-  t.equal(type, cu);
+  const isNull = operators["IS NULL"];
 
   t.true(isNull(undefined));
   t.true(isNull(null));
@@ -89,8 +74,7 @@ test("IS NULL", (t) => {
 });
 
 test("IS NOT NULL", (t) => {
-  const [isNotNull, type] = operators["IS NOT NULL"];
-  t.equal(type, cu);
+  const isNotNull = operators["IS NOT NULL"];
 
   t.false(isNotNull(undefined));
   t.false(isNotNull(null));
@@ -103,8 +87,7 @@ test("IS NOT NULL", (t) => {
 });
 
 test("AND", (t) => {
-  const [and, type] = operators["AND"];
-  t.equal(type, bb);
+  const and = operators["AND"];
 
   t.true(and(1, 1));
   t.false(and(1, 0));
@@ -114,8 +97,7 @@ test("AND", (t) => {
 });
 
 test("&& is the same as AND", (t) => {
-  const [ampAmp, type] = operators["&&"];
-  t.equal(type, bb);
+  const ampAmp = operators["&&"];
 
   t.true(ampAmp(1, 1));
   t.false(ampAmp(1, 0));
@@ -125,8 +107,7 @@ test("&& is the same as AND", (t) => {
 });
 
 test("OR", (t) => {
-  const [or, type] = operators["OR"];
-  t.equal(type, bb);
+  const or = operators["OR"];
 
   t.true(or(1, 1));
   t.true(or(1, 0));
@@ -136,8 +117,7 @@ test("OR", (t) => {
 });
 
 test("|| is the same as OR", (t) => {
-  const [pipePipe, type] = operators["||"];
-  t.equal(type, bb);
+  const pipePipe = operators["||"];
 
   t.true(pipePipe(1, 1));
   t.true(pipePipe(1, 0));
@@ -147,8 +127,7 @@ test("|| is the same as OR", (t) => {
 });
 
 test("NOT", (t) => {
-  const [not, type] = operators["NOT"];
-  t.equal(type, bu);
+  const not = operators["NOT"];
 
   t.true(not(0));
   t.false(not(1));
@@ -156,8 +135,7 @@ test("NOT", (t) => {
 });
 
 test("! is the same as NOT", (t) => {
-  const [bang, type] = operators["!"];
-  t.equal(type, bu);
+  const bang = operators["!"];
 
   t.true(bang(0));
   t.false(bang(1));

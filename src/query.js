@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { operators, operatorTypes } from "./operators";
+import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 
 const DEFAULT_SORT_ORDER = "asc";
@@ -73,7 +73,7 @@ function evaluateCondition(input, condition, data) {
 }
 
 function evaluateOperatorPredicate(input, condition, data) {
-  const [predicate, type] = getOperator(condition.op);
+  const predicate = getOperator(condition.op);
   return input.filter((row) => predicate(row[condition.field], condition.value));
 }
 
