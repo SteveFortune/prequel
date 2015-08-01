@@ -108,13 +108,18 @@ and_expression
   = first:base_expression rest:(_ op:and_operator _ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
 
 operator_expression
-  = field:identifier _ op:unary_operator { return { field, op } }
-  / field:identifier _ op:binary_operator _ value:literal { return { field, op, value } }
+  = lhs:operand _ op:unary_operator { return { lhs, op } }
+  / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
   / reference:identifier { return { reference } }
 
 base_expression
   = operator_expression
   / lp expr:expression rp { return expr }
+
+operand
+  = literal:literal { return { literal } }
+  / identifier:identifier { return { identifier } }
+
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="

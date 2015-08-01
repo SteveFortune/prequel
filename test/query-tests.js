@@ -32,7 +32,7 @@ test("SELECT *", (t) => {
 test("WHERE binary predicate", (t) => {
   const data = { f: [{ a: 1 }, { a: 3 }] };
 
-  const condition = { op: ">", field: "a", value: 2 };
+  const condition = { op: ">", lhs: { identifier: "a" }, rhs: { literal: 2 } };
   const q = { where: condition, fields: [], source: "f" };
 
   const result = query(q, data);
@@ -43,7 +43,7 @@ test("WHERE binary predicate", (t) => {
 test("WHERE unary predicate", (t) => {
   const data = { f: [{ a: 1 }, { a: 3 }] };
 
-  const condition = { op: "IS NOT NULL", field: "a" };
+  const condition = { lhs: { identifier: "a" }, op: "IS NOT NULL" };
   const q = { where: condition, fields: [], source: "f" };
 
   const result = query(q, data);

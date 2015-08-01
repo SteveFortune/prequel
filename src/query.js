@@ -1,13 +1,15 @@
 import _ from "lodash";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
+import buildResolve from "./resolve";
 
 const DEFAULT_SORT_ORDER = "asc";
 
 export default function executeQuery(parsedQuery, data) {
   const input = data[parsedQuery.source];
+  const resolve = buildResolve(parsedQuery, data);
 
-  const filtered = where(input, parsedQuery, data);
+  const filtered = where(input, parsedQuery, resolve);
   const aggregated = group(filtered, parsedQuery);
   const ordered = order(aggregated, parsedQuery);
   const limited = limit(ordered, parsedQuery);
@@ -53,33 +55,51 @@ function selectAll(target) {
   return target;
 }
 
-function where(input, { where: condition }, data={}) {
+function where(input, { where: condition }, resolve) {
   if(condition) {
-    return evaluateCondition(input, condition, data);
+    return filter(input, condition, resolve);
   } else {
     return input;
   }
 }
 
-function evaluateCondition(input, condition, data) {
-  if(condition.op) {
-    return evaluateOperatorPredicate(input, condition, data);
-  } else if(condition.reference) {
-    const referencedDatum = data[condition.reference];
-    return evaluateReferencePredicate(input, referencedDatum);
+function filter(input, condition, resolve) {
+  const predicate = buildExpression(condition, resolve);
+  return input.filter(predicate);
+}
+
+// Return a function that evaluates an expression for the given input
+
+function buildExpression(expr, resolve) {
+  if(expr.op) {
+    const func = buildOperatorExpression(expr, resolve);
+    return (row, rowNum) => {
+      return func(row, rowNum);
+    };
+  } else if (expr.identifier) {
+    return (row, rowNum) => resolve(expr.identifier, row, rowNum);
+  } else if(expr.literal) {
+    return () => expr.literal;
+  } else if (expr.reference) {
+    return (row, rowNum) => resolve(expr.reference, row, rowNum);
   } else {
-    throw new Error(`Invalid WHERE condition: ${JSON.stringify(condition)}`);
+    throw new Error(`unexpected expression: ${JSON.stringify(expr)}`);
   }
 }
 
-function evaluateOperatorPredicate(input, condition, data) {
-  const predicate = getOperator(condition.op);
-  return input.filter((row) => predicate(row[condition.field], condition.value));
-}
+function buildOperatorExpression(expr, resolve) {
+  const evaluateOperator = getOperator(expr.op);
 
-function evaluateReferencePredicate(input, referenced) {
-  const predicate = _.isFunction(referenced) ? referenced : () => referenced;
-  return input.filter(predicate);
+  const lhs = buildExpression(expr.lhs, resolve);
+  const rhs = expr.rhs
+    ? buildExpression(expr.rhs, resolve)
+    : undefined;
+
+  return (row, rowNum) => {
+    const lhsResult = lhs(row, rowNum);
+    const rhsResult = rhs ? rhs(row, rowNum) : undefined;
+    return evaluateOperator(lhsResult, rhsResult);
+  };
 }
 
 function getOperator(op) {

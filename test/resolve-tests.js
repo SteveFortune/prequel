@@ -1,5 +1,4 @@
 import test from "tape";
-import _ from "lodash";
 import makeResolve from "../src/resolve";
 
 const fields = [

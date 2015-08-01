@@ -55,6 +55,14 @@ test("SELECT * FROM ${rows} WHERE ${(row, n) => n % 2}", (t) => {
   t.end();
 });
 
+test("SELECT * FROM ${rows} WHERE ${(row, n) => n % 2} AND (a = 2 OR a <> 4 AND b IS NULL) AND NOT a >= ${1 + 2}", (t) => {
+  const rows = [1, 2, 3, 4, 5, 6].map(a => ({ a }));
+
+  const result = oql`SELECT * FROM ${rows} WHERE ${(row, n) => n % 2} AND (a = 2 OR a <> 4 AND b IS NULL) AND a < ${1 + 2}`;
+  t.deepEqual([{ a: 2 }], result);
+  t.end();
+});
+
 test("SELECT a, b FROM ${rows} ORDER BY a", (t) => {
   const rows = [5, 4, 7].map(x => ({ a: x }));
   const implicitResult = oql`SELECT a, b FROM ${rows} ORDER BY a`;
