@@ -1,8 +1,8 @@
-import _ from "lodash";
+import { indexBy, isFunction } from "./util";
 
 export default function makeResolve(query, data) {
   const withAlias = query.fields.filter(f => f.as);
-  const aliases = _.indexBy(withAlias, "as");
+  const aliases = indexBy(withAlias, "as");
 
   return function resolve(identifier, row, rowNumber) {
     // Field with name `identifier`
@@ -18,7 +18,7 @@ export default function makeResolve(query, data) {
     // Referenced datum with key `identifier`
     const datum = data[identifier];
     if(datum) {
-      return _.isFunction(datum) ? datum(row, rowNumber) : datum;
+      return isFunction(datum) ? datum(row, rowNumber) : datum;
     }
 
     return undefined;

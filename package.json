@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/jwhitfieldseed/prequel#readme",
   "dependencies": {
-    "lodash": "^3.10.0"
+    "lodash.sortbyorder": "^3.4.4"
   },
   "devDependencies": {
     "pegjs": "^0.8.0",

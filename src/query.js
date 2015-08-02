@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { groupBy, mapObject, pickKeys, sortByOrder } from "./util";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 import buildResolve from "./resolve";
@@ -116,9 +116,9 @@ function group(input, query) {
   }
 }
 
-function aggregateByGroup(input, { fields: outputFields, group: groupBy }) {
-  const rowGroups = _.groupBy(input, row => getGroupKey(row, groupBy.fields));
-  return _.map(rowGroups, rows => getGroupOutputRow(rows, outputFields));
+function aggregateByGroup(input, { fields: outputFields, group: groupOptions }) {
+  const rowGroups = groupBy(input, row => getGroupKey(row, groupOptions.fields));
+  return mapObject(rowGroups, rows => getGroupOutputRow(rows, outputFields));
 }
 
 function aggregateOverall(input, { fields }) {
@@ -126,7 +126,7 @@ function aggregateOverall(input, { fields }) {
 }
 
 function getGroupKey(row, groupFields) {
-  return JSON.stringify(_.pick(row, groupFields));
+  return JSON.stringify(pickKeys(row, groupFields));
 }
 
 function getGroupOutputRow(groupRows, outputFields) {
@@ -148,7 +148,7 @@ function getGroupOutputRow(groupRows, outputFields) {
 }
 
 function aggregate(groupRows, field, aggregateName) {
-  const inputValues = _.pluck(groupRows, field.name);
+  const inputValues = groupRows.map(row => row[field.name]);
   const func = getAggregateFunction(aggregateName);
   return func(inputValues);
 }
@@ -162,7 +162,7 @@ function order(input, { order: fieldOrders }) {
     const fields = fieldOrders.map(o => o.field);
     const orders = fieldOrders.map(getSortOrder);
 
-    return _.sortByOrder(input, fields, orders);
+    return sortByOrder(input, fields, orders);
   } else {
     return input;
   }

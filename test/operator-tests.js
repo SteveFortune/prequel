@@ -2,8 +2,6 @@
 import test from "tape";
 import operators from "../src/operators";
 
-console.log(operators);
-
 test("=", (t) => {
   const eq = operators["="];
 
