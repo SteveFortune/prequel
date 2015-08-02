@@ -174,9 +174,9 @@ test("SELECT COUNT(DISTINCT a), b FROM ${rows}", (t) => {
   t.end();
 });
 
-test("SELECT * FROM ${rows} LIMIT 2 2", (t) => {
+test("SELECT * FROM ${rows} LIMIT 2, 2", (t) => {
   const rows = [1, 2, 3, 4, 5].map(a => ({ a }));
-  const result = oql`SELECT * FROM ${rows} LIMIT 2 2`;
+  const result = oql`SELECT * FROM ${rows} LIMIT 2, 2`;
   t.deepEqual([3, 4], result.map(r => (r.a)));
   t.end();
 });
@@ -195,7 +195,7 @@ test("SELECT * FROM ${rows} LIMIT 4 ORDER BY a DESC", (t) => {
   t.end();
 });
 
-test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1 1", (t) => {
+test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1, 1", (t) => {
   const rows = [
     { a: 1, b: 1 },
     { a: 1, b: 2 },
@@ -205,7 +205,7 @@ test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LI
     { a: 3, b: 3 }
   ];
 
-  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1 1`;
+  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1, 1`;
   const expected = [
     { a: 2, count_b: 1, count_distinct_b: 1 }
   ];
@@ -214,7 +214,7 @@ test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LI
   t.end();
 });
 
-test("Iterable: SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1 1", (t) => {
+test("Iterable: SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1, 1", (t) => {
   const rows = wrap([
     { a: 1, b: 1 },
     { a: 1, b: 2 },
@@ -224,7 +224,7 @@ test("Iterable: SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY
     { a: 3, b: 3 }
   ]);
 
-  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1 1`;
+  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1, 1`;
   const expected = [
     { a: 2, count_b: 1, count_distinct_b: 1 }
   ];

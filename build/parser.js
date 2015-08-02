@@ -740,7 +740,7 @@ module.exports = (function() {
       s0 = peg$currPos;
       s1 = peg$parseint();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
+        s2 = peg$parselist_delim();
         if (s2 !== peg$FAILED) {
           s3 = peg$parseint();
           if (s3 !== peg$FAILED) {

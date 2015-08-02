@@ -56,7 +56,7 @@ limit
   = _ "LIMIT" _ limit:limit_parameters { return limit }
 
 limit_parameters
-  = offset:int _ count:int { return { offset: +offset, count: +count } }
+  = offset:int list_delim count:int { return { offset: +offset, count: +count } }
   / count:int { return { count: +count } }
 
 field_list

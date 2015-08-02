@@ -169,7 +169,7 @@ test("LIMIT count", t => {
 });
 
 test("LIMIT offset count", t => {
-  const out = parse("SELECT * FROM x LIMIT 5 10");
+  const out = parse("SELECT * FROM x LIMIT 5, 10");
   t.deepEqual(out.limit, { offset: 5, count: 10 });
   t.end();
 });
