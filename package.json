@@ -4,8 +4,11 @@
   "description": "Query JavaScript objects with SQL",
   "main": "index.js",
   "scripts": {
+    "build-parser": "pegjs src/sql.pegjs build/parser.js",
+    "pretest": "npm run build-parser",
     "test": "babel-node $(which tape) ./test/*.js | faucet",
-    "coverage": "istanbul cover babel-node ./test/e2e-tests.js"
+    "coverage": "istanbul cover babel-node ./test/e2e-tests.js",
+    "clean": "rm build/*"
   },
   "repository": {
     "type": "git",
@@ -23,10 +26,10 @@
   },
   "homepage": "https://github.com/jwhitfieldseed/prequel#readme",
   "dependencies": {
-    "lodash": "^3.10.0",
-    "pegjs": "^0.8.0"
+    "lodash": "^3.10.0"
   },
   "devDependencies": {
+    "pegjs": "^0.8.0",
     "istanbul": "^0.3.17",
     "babel": "^5.6.23",
     "faucet": "0.0.1",
