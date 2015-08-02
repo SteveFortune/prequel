@@ -1,7 +1,7 @@
 [
   {
     "id": 0,
-    "isActive": true,
+    "isActive": 1,
     "age": 30,
     "eyeColor": "blue",
     "name": "Strickland Montoya",
@@ -14,7 +14,7 @@
   },
   {
     "id": 1,
-    "isActive": false,
+    "isActive": 0,
     "age": 31,
     "eyeColor": "green",
     "name": "Margie Duffy",
@@ -27,7 +27,7 @@
   },
   {
     "id": 2,
-    "isActive": true,
+    "isActive": 1,
     "age": 28,
     "eyeColor": "blue",
     "name": "Thelma Johnston",
@@ -40,7 +40,7 @@
   },
   {
     "id": 3,
-    "isActive": false,
+    "isActive": 0,
     "age": 24,
     "eyeColor": "blue",
     "name": "Estes Leblanc",
@@ -53,7 +53,7 @@
   },
   {
     "id": 4,
-    "isActive": true,
+    "isActive": 1,
     "age": 29,
     "eyeColor": "green",
     "name": "Corine Hale",
@@ -66,7 +66,7 @@
   },
   {
     "id": 5,
-    "isActive": false,
+    "isActive": 0,
     "age": 37,
     "eyeColor": "brown",
     "name": "Kelly Houston",
@@ -79,7 +79,7 @@
   },
   {
     "id": 6,
-    "isActive": true,
+    "isActive": 1,
     "age": 40,
     "eyeColor": "green",
     "name": "Ellen Gould",
@@ -92,7 +92,7 @@
   },
   {
     "id": 7,
-    "isActive": true,
+    "isActive": 1,
     "age": 31,
     "eyeColor": "green",
     "name": "Wynn Johnson",
@@ -105,7 +105,7 @@
   },
   {
     "id": 8,
-    "isActive": true,
+    "isActive": 1,
     "age": 37,
     "eyeColor": "brown",
     "name": "Lorrie Nixon",
@@ -118,7 +118,7 @@
   },
   {
     "id": 9,
-    "isActive": false,
+    "isActive": 0,
     "age": 31,
     "eyeColor": "blue",
     "name": "Chapman Gibbs",
@@ -131,7 +131,7 @@
   },
   {
     "id": 10,
-    "isActive": true,
+    "isActive": 1,
     "age": 22,
     "eyeColor": "green",
     "name": "Mcbride Nunez",
@@ -144,7 +144,7 @@
   },
   {
     "id": 11,
-    "isActive": true,
+    "isActive": 1,
     "age": 23,
     "eyeColor": "green",
     "name": "Snow Finch",
@@ -157,7 +157,7 @@
   },
   {
     "id": 12,
-    "isActive": false,
+    "isActive": 0,
     "age": 25,
     "eyeColor": "blue",
     "name": "Katrina Lopez",
@@ -170,7 +170,7 @@
   },
   {
     "id": 13,
-    "isActive": true,
+    "isActive": 1,
     "age": 39,
     "eyeColor": "blue",
     "name": "Haney Wilder",
@@ -183,7 +183,7 @@
   },
   {
     "id": 14,
-    "isActive": true,
+    "isActive": 1,
     "age": 34,
     "eyeColor": "brown",
     "name": "Holt Tate",
@@ -196,7 +196,7 @@
   },
   {
     "id": 15,
-    "isActive": true,
+    "isActive": 1,
     "age": 34,
     "eyeColor": "green",
     "name": "Thomas Armstrong",
@@ -209,7 +209,7 @@
   },
   {
     "id": 16,
-    "isActive": true,
+    "isActive": 1,
     "age": 31,
     "eyeColor": "brown",
     "name": "Nelson Charles",
@@ -222,7 +222,7 @@
   },
   {
     "id": 17,
-    "isActive": true,
+    "isActive": 1,
     "age": 22,
     "eyeColor": "green",
     "name": "Sharron Rodriguez",
@@ -235,7 +235,7 @@
   },
   {
     "id": 18,
-    "isActive": false,
+    "isActive": 0,
     "age": 25,
     "eyeColor": "green",
     "name": "Coleman Moore",
@@ -248,7 +248,7 @@
   },
   {
     "id": 19,
-    "isActive": false,
+    "isActive": 0,
     "age": 23,
     "eyeColor": "green",
     "name": "Diaz Alvarez",
@@ -261,7 +261,7 @@
   },
   {
     "id": 20,
-    "isActive": true,
+    "isActive": 1,
     "age": 29,
     "eyeColor": "brown",
     "name": "Vaughan Stevens",
@@ -274,7 +274,7 @@
   },
   {
     "id": 21,
-    "isActive": true,
+    "isActive": 1,
     "age": 21,
     "eyeColor": "brown",
     "name": "King Farley",
@@ -287,7 +287,7 @@
   },
   {
     "id": 22,
-    "isActive": true,
+    "isActive": 1,
     "age": 38,
     "eyeColor": "brown",
     "name": "Hoffman Grant",
@@ -300,7 +300,7 @@
   },
   {
     "id": 23,
-    "isActive": true,
+    "isActive": 1,
     "age": 27,
     "eyeColor": "brown",
     "name": "Harrington Oneil",
@@ -313,7 +313,7 @@
   },
   {
     "id": 24,
-    "isActive": true,
+    "isActive": 1,
     "age": 29,
     "eyeColor": "brown",
     "name": "Rocha Shepard",
@@ -326,7 +326,7 @@
   },
   {
     "id": 25,
-    "isActive": true,
+    "isActive": 1,
     "age": 21,
     "eyeColor": "blue",
     "name": "Holmes Willis",
@@ -339,7 +339,7 @@
   },
   {
     "id": 26,
-    "isActive": true,
+    "isActive": 1,
     "age": 25,
     "eyeColor": "green",
     "name": "Dorthy Padilla",
@@ -352,7 +352,7 @@
   },
   {
     "id": 27,
-    "isActive": true,
+    "isActive": 1,
     "age": 38,
     "eyeColor": "blue",
     "name": "Brandi Guthrie",
@@ -365,7 +365,7 @@
   },
   {
     "id": 28,
-    "isActive": false,
+    "isActive": 0,
     "age": 24,
     "eyeColor": "blue",
     "name": "Audrey Bradford",
@@ -378,7 +378,7 @@
   },
   {
     "id": 29,
-    "isActive": true,
+    "isActive": 1,
     "age": 25,
     "eyeColor": "green",
     "name": "Charlotte Boyle",
