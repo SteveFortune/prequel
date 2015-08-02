@@ -6,7 +6,7 @@ import buildResolve from "./resolve";
 const DEFAULT_SORT_ORDER = "asc";
 
 export default function executeQuery(parsedQuery, data) {
-  const input = data[parsedQuery.source];
+  const input = [...data[parsedQuery.source]];
   const resolve = buildResolve(parsedQuery, data);
 
   const filtered = where(input, parsedQuery, resolve);

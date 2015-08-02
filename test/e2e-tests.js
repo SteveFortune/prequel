@@ -2,6 +2,12 @@
 import test from "tape";
 import oql from "../";
 
+function* wrap(inputArray) {
+  for(let value of inputArray) {
+    yield value;
+  }
+}
+
 test("SELECT a, b FROM ${rows}", (t) => {
   const rows = [
     { a: 1, b: 2, c: 3 },
@@ -198,6 +204,25 @@ test("SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LI
     { a: 3, b: 2 },
     { a: 3, b: 3 }
   ];
+
+  const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1 1`;
+  const expected = [
+    { a: 2, count_b: 1, count_distinct_b: 1 }
+  ];
+
+  t.deepEqual(expected, result);
+  t.end();
+});
+
+test("Iterable: SELECT a, COUNT(b), COUNT(DISTINCT b) FROM x GROUP BY a ORDER BY a DESC LIMIT 1 1", (t) => {
+  const rows = wrap([
+    { a: 1, b: 1 },
+    { a: 1, b: 2 },
+    { a: 1, b: 2 },
+    { a: 2, b: 1 },
+    { a: 3, b: 2 },
+    { a: 3, b: 3 }
+  ]);
 
   const result = oql`SELECT a, COUNT(b), COUNT(DISTINCT b) FROM ${rows} GROUP BY a ORDER BY a DESC LIMIT 1 1`;
   const expected = [
