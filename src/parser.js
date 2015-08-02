@@ -1,5 +1,5 @@
 import parser from "../build/parser";
 
-export default function(query) {
+export default function parse(query) {
   return parser.parse(query);
 }

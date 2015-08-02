@@ -6,7 +6,7 @@
   "scripts": {
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
     "pretest": "npm run build-parser",
-    "test": "babel-node $(which tape) ./test/*.js | faucet",
+    "test": "babel-node $(which tape) \"./test/**/*.js\" | faucet",
     "coverage": "istanbul cover babel-node ./test/e2e-tests.js",
     "clean": "rm build/*"
   },
@@ -29,10 +29,11 @@
     "lodash.sortbyorder": "^3.4.4"
   },
   "devDependencies": {
-    "pegjs": "^0.8.0",
-    "istanbul": "^0.3.17",
     "babel": "^5.6.23",
     "faucet": "0.0.1",
+    "istanbul": "^0.3.17",
+    "pegjs": "^0.8.0",
+    "sql.js": "^0.2.21",
     "tape": "^4.0.1"
   }
 }
