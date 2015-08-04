@@ -241,6 +241,16 @@ test("SELECT AVG(a), b FROM x", (t) => {
   t.end();
 });
 
+test("SELECT COUNT(*) FROM x", (t) => {
+  const input = [1, 2, 3, 4, 5].map(a => ({ a }));
+
+  const q = { fields: [{ name: "*", aggregate: "COUNT" }], source: "$1" };
+  const result = testQuery(t, q, input);
+
+  t.deepEqual([{ "count_*": 5 }], result);
+  t.end();
+});
+
 test("SELECT * FROM x LIMIT 3", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
@@ -249,6 +259,10 @@ test("SELECT * FROM x LIMIT 3", (t) => {
 
   t.equal(3, result.length);
   t.end();
+});
+
+test.skip("SELECT not_there FROM x LIMIT 3", () => {
+  // TODO: should throw "missing field" - #23.
 });
 
 test("SELECT * FROM x LIMIT 0", (t) => {
