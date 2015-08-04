@@ -91,6 +91,7 @@ aggregated_field
 
 special_aggregated_field
   = "COUNT(DISTINCT" _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", name } }
+  / aggregate:"COUNT" lp name:"*" rp { return { aggregate, name } }
 
 aggregate_function
   = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"

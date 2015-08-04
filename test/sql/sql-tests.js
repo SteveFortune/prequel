@@ -12,13 +12,13 @@ function testQuery(sql, { test=deepEqual, log=false, only=false } = {}) {
   const tapeFunc = only ? tape.only : tape;
 
   tapeFunc(sql, function(t) {
+    const dbResult = db.query(sql);
+    if(log) {
+      t.comment(JSON.stringify(dbResult));
+    }
+
     const parsed = prequelParse(sql);
     const prequelResult = prequelQuery(parsed, { [table]: testData });
-    const dbResult = db.query(sql);
-
-    if(log) {
-      t.comment(JSON.stringify(prequelResult));
-    }
 
     test(t, prequelResult, dbResult);
   });
@@ -67,6 +67,8 @@ testQuery(`SELECT name, greeting FROM ${table} WHERE unread > 20`);
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);
 testQuery(`SELECT AVG(age) AS avg_age FROM ${table}`);
 // testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups});
+// testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroups });
+
 
 // ORDER BY
 testQuery(`SELECT name, age FROM ${table} ORDER BY age`);
@@ -78,7 +80,10 @@ testQuery(`SELECT * FROM ${table} ORDER BY age, company DESC, isActive ASC`);
 // testQuery(`SELECT fruit AS food, age FROM ${table} GROUP BY fruit, age`, { test: matchGroups });
 // testQuery(`SELECT company, COUNT(name), MAX(age) FROM ${table} GROUP BY company`, { test: matchGroups });
 // testQuery(`SELECT company, COUNT(age), COUNT(DISTINCT age) FROM ${table} GROUP BY company`, { test: matchGroups });
+// testQuery(`SELECT COUNT(*) FROM ${table} GROUP BY fruit`, { test: matchGroups });
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age ORDER BY age`);
+
+
 
 // LIMIT
 testQuery(`SELECT * FROM ${table} LIMIT 1`);
