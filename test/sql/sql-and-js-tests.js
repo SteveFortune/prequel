@@ -38,3 +38,10 @@ test("SELECT * FROM ${iterableInput()} WHERE ${row => row.name.length > 15} AND 
   t.deepEqual([ 0, 15, 17, 23 ], result.map(r => r.id));
   t.end();
 });
+
+
+test("prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}`", (t) => {
+  const result = prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}`;
+  t.deepEqual([26, 27, 28, 29], result.map(r => r.id));
+  t.end();
+});
