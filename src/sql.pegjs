@@ -87,11 +87,11 @@ identifier
 
 aggregated_field
   = special_aggregated_field
-  / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, name } }
+  / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, source: name } }
 
 special_aggregated_field
-  = "COUNT(DISTINCT" _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", name } }
-  / aggregate:"COUNT" lp name:"*" rp { return { aggregate, name } }
+  = "COUNT(DISTINCT" _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
+  / aggregate:"COUNT" lp name:"*" rp { return { aggregate, source: name } }
 
 aggregate_function
   = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"

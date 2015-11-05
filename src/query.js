@@ -7,15 +7,28 @@ const DEFAULT_SORT_ORDER = "asc";
 
 export default function executeQuery(parsedQuery, data) {
   const input = [...data[parsedQuery.source]];
-  const resolve = buildResolve(parsedQuery, data);
+  const query = enrichQuery(parsedQuery, data);
 
-  const filtered = where(input, parsedQuery, resolve);
-  const aggregated = group(filtered, parsedQuery);
-  const ordered = order(aggregated, parsedQuery);
-  const limited = limit(ordered, parsedQuery);
-  const projected = select(limited, parsedQuery);
+  const filtered = where(input, query);
+  const aggregated = group(filtered, query);
+  const ordered = order(aggregated, query);
+  const limited = limit(ordered, query);
+  const projected = select(limited, query);
 
   return projected;
+}
+
+function enrichQuery(parsedQuery, data) {
+  return Object.assign({}, parsedQuery, {
+    fields: getOutputFields(parsedQuery),
+    resolve: buildResolve(parsedQuery, data)
+  });
+}
+
+function getOutputFields({ fields }) {
+  return fields.map(field => Object.assign({}, field, {
+    outputName: getOutputFieldName(field)
+  }));
 }
 
 function select(target, { fields }) {
@@ -31,31 +44,41 @@ function selectFields(target, fields) {
 function projectFields(row, fields) {
   const out = {};
   for(let field of fields) {
-    let projectedName = getOutputFieldName(field);
-
-    // TODO this is a hack - we need some better way of
-    //  the projection knowing that a field has a constructed
-    //  name (e.g. from a function).
-    out[projectedName] = row[field.outputName || field.name];
+    out[field.outputName] = getOutputValue(field, row);
   }
 
   return out;
 }
 
-function getOutputFieldName(field) {
-  if(field.as) return field.as;
-  if(field.aggregate) {
-    return `${field.aggregate.toLowerCase()}_${field.name}`;
+function getOutputValue(field, row) {
+  if(field.name) {
+    return row[field.name];
+  } else if(field.aggregate) {
+    return row[field.outputName];
+  } else {
+    throw new Error(`Unexpected output field: ${JSON.stringify(field)}`);
   }
+}
 
-  return field.name;
+function getOutputFieldName(field) {
+  if(field.as) {
+    return field.as;
+  } else if(field.aggregate) {
+    return getAggregateOutputFieldName(field);
+  } else {
+    return field.name;
+  }
+}
+
+function getAggregateOutputFieldName(field) {
+  return `${field.aggregate.toLowerCase()}_${field.source}`;
 }
 
 function selectAll(target) {
   return target;
 }
 
-function where(input, { where: condition }, resolve) {
+function where(input, { where: condition, resolve }) {
   if(condition) {
     return filter(input, condition, resolve);
   } else {
@@ -131,24 +154,18 @@ function getGroupKey(row, groupFields) {
 
 function getGroupOutputRow(groupRows, outputFields) {
   return outputFields.reduce((row, field) => {
-    const outputName = getOutputFieldName(field);
-
-    // TODO this is a hack - it should be possible to pass through constructed
-    //  output field names witout mutating here. Could we label all fields
-    //  with their output name before running any query steps?
-    field.outputName = outputName;
 
     const outputValue = field.aggregate
       ? aggregate(groupRows, field, field.aggregate)
       : getDefaultGroupValue(groupRows, field);
 
-    row[outputName] = outputValue;
+    row[field.outputName] = outputValue;
     return row;
   }, {});
 }
 
 function aggregate(groupRows, field, aggregateName) {
-  const inputValues = groupRows.map(row => row[field.name]);
+  const inputValues = groupRows.map(row => row[field.source]);
   const func = getAggregateFunction(aggregateName);
   return func(inputValues);
 }

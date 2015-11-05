@@ -189,7 +189,7 @@ test("SELECT COUNT(b) FROM x GROUP BY a", (t) => {
     { a: 2, b: 3 }
   ];
 
-  const q = { fields: [{ name: "b", aggregate: "COUNT" }], source: "$1", group: { fields: ["a"] } };
+  const q = { fields: [{ source: "b", aggregate: "COUNT" }], source: "$1", group: { fields: ["a"] } };
 
   const result = testQuery(t, q, input);
   t.deepEqual([{ count_b: 1 }, { count_b: 3 }], result);
@@ -204,7 +204,7 @@ test("SELECT a, MAX(b) FROM x GROUP BY a", (t) => {
     { a: 2, b: 3 }
   ];
 
-  const q = { fields: [{ name: "a" }, { name: "b", aggregate: "MAX" }], source: "$1", group: { fields: ["a"] } };
+  const q = { fields: [{ name: "a" }, { source: "b", aggregate: "MAX" }], source: "$1", group: { fields: ["a"] } };
 
   const result = testQuery(t, q, input);
   t.deepEqual([{ a: 1, max_b: 1 }, { a: 2, max_b: 3 }], result);
@@ -214,7 +214,7 @@ test("SELECT a, MAX(b) FROM x GROUP BY a", (t) => {
 test("SELECT AVG(a) FROM x", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
-  const q = { fields: [{ name: "a", aggregate: "AVG" }], source: "$1" };
+  const q = { fields: [{ source: "a", aggregate: "AVG" }], source: "$1" };
   const result = testQuery(t, q, input);
 
   t.deepEqual([{ avg_a: 3 }], result);
@@ -224,7 +224,7 @@ test("SELECT AVG(a) FROM x", (t) => {
 test("SELECT AVG(a), b FROM x", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a, b: 2 * a }));
 
-  const q = { fields: [{ name: "a", aggregate: "AVG" }, { name: "b" }], source: "$1" };
+  const q = { fields: [{ source: "a", aggregate: "AVG" }, { name: "b" }], source: "$1" };
   const result = testQuery(t, q, input);
 
   t.deepEqual([{ avg_a: 3, b: 2 }], result);
@@ -234,7 +234,7 @@ test("SELECT AVG(a), b FROM x", (t) => {
 test("SELECT AVG(a), b FROM x", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a, b: 2 * a }));
 
-  const q = { fields: [{ name: "a", aggregate: "AVG" }, { name: "b" }], source: "$1" };
+  const q = { fields: [{ source: "a", aggregate: "AVG" }, { name: "b" }], source: "$1" };
   const result = testQuery(t, q, input);
 
   t.deepEqual([{ avg_a: 3, b: 2 }], result);
@@ -244,7 +244,7 @@ test("SELECT AVG(a), b FROM x", (t) => {
 test("SELECT COUNT(*) FROM x", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
-  const q = { fields: [{ name: "*", aggregate: "COUNT" }], source: "$1" };
+  const q = { fields: [{ source: "*", aggregate: "COUNT" }], source: "$1" };
   const result = testQuery(t, q, input);
 
   t.deepEqual([{ "count_*": 5 }], result);
