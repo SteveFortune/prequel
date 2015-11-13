@@ -59,6 +59,7 @@ testQuery(`SELECT name, age FROM ${table}`);
 testQuery(`SELECT name, age, greeting AS msg FROM ${table}`);
 testQuery(`SELECT * FROM ${table}`);
 testQuery(`SELECT name AS nom, age FROM ${table}`);
+testQuery(`select name as nom, age FROM ${table}`);
 
 // WHERE
 testQuery(`SELECT name, greeting FROM ${table} WHERE unread > 20`);
@@ -92,6 +93,7 @@ testQuery(`SELECT * FROM ${table} ORDER BY name DESC LIMIT 4`);
 
 // Mixture
 testQuery(`SELECT age, COUNT(name) AS count, COUNT(DISTINCT company) AS distinct_companies FROM ${table} GROUP BY age ORDER BY age DESC LIMIT 1, 1`);
+testQuery(`select age, count(name) AS count, count(distinct company) AS distinct_companies FROM ${table} group by age order by age desc limit 1, 1`);
 
 // TODO:
 // * sorting, grouping by alias

@@ -8,13 +8,18 @@
       return { op: curr.op, lhs, rhs: curr.rhs }
     }, first);
   }
+
+  // Return the text of the matched rule in upper case
+  var T = function() {
+    return text().toUpperCase();
+  }
 }
 
 start
   = query
 
 query
-  = select:select where:where? group:group? order:order? limit:limit? {
+  = select:select_clause where:where_clause? group:group_clause? order:order_clause? limit:limit_clause? {
     if(where) select.where = where;
     if(group) select.group = group;
     if(order) select.order = order;
@@ -22,20 +27,20 @@ query
     return select;
   }
 
-select
-  = "SELECT" _ fields:field_list _ "FROM" _ source:source { return { fields, source } }
+select_clause
+  = select _ fields:field_list _ from _ source:source { return { fields, source } }
 
-where
-  = _ "WHERE" _ condition:where_condition { return condition }
+where_clause
+  = _ where _ condition:where_condition { return condition }
 
 where_condition
   = expression
 
-group
-  = _ "GROUP BY" _ fields:identifier_list { return { fields } }
+group_clause
+  = _ group_by _ fields:identifier_list { return { fields } }
 
-order
-  = _ "ORDER BY" _ order:order_tuple_list { return order }
+order_clause
+  = _ order_by _ order:order_tuple_list { return order }
 
 order_tuple_list
   = head:order_tuple_delim tail:order_tuple_list { return [head].concat(tail) }
@@ -48,12 +53,20 @@ order_tuple
   = field:identifier _ order:order_dir { return { field, order } }
   / field:identifier { return { field } }
 
-order_dir
-  = "ASC"
-  / "DESC"
+order_dir = asc / desc
 
-limit
-  = _ "LIMIT" _ limit:limit_parameters { return limit }
+limit_clause
+  = _ limit _ limit:limit_parameters { return limit }
+
+select = "SELECT"i
+from = "FROM"i
+where = "WHERE"i
+group_by = "GROUP BY"i
+order_by = "ORDER BY"i
+limit = "LIMIT"i
+as = "AS"i 
+asc = "ASC"i { return T() }
+desc = "DESC"i { return T() }
 
 limit_parameters
   = offset:int list_delim count:int { return { offset: +offset, count: +count } }
@@ -68,7 +81,7 @@ field_delim
   = field:field list_delim { return field }
 
 field
-  = expr:field_expression _ "AS" _ as:identifier { expr.as = as; return expr }
+  = expr:field_expression _ as _ as:identifier { expr.as = as; return expr }
   / expr:field_expression { return expr }
 
 field_expression
@@ -90,11 +103,27 @@ aggregated_field
   / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, source: name } }
 
 special_aggregated_field
-  = "COUNT(DISTINCT" _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
-  / aggregate:"COUNT" lp name:"*" rp { return { aggregate, source: name } }
+  = count "(" distinct _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
+  / aggregate:count lp name:"*" rp { return { aggregate, source: name } }
 
 aggregate_function
-  = "AVG" / "COUNT" / "FIRST" / "LAST" / "MAX" / "MIN" / "SUM"
+  = avg / count / first / last / max / min / sum
+
+avg = t:"AVG"i { return T() }
+count = t:"COUNT"i { return T() }
+first = t:"FIRST"i { return T() }
+last = t:"LAST"i { return T() }
+max = t:"MAX"i { return T() }
+min = t:"MIN"i { return T() }
+sum = t:"SUM"i { return T() }
+distinct = t:"DISTINCT"i { return T() }
+star = "*";
+
+is_null = "IS NULL"i { return T() }
+is_not_null = "IS NOT NULL"i { return T() }
+and = "AND"i { return T() }
+or = "OR"i { return T() }
+not = "NOT"i { return T() }
 
 // Expressions use unrolled recursion
 // HT http://stackoverflow.com/a/30798758/2806996
@@ -126,17 +155,16 @@ binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="
 
 unary_operator
-  = "IS NULL"
-  / "IS NOT NULL"
+  = is_null / is_not_null
 
 and_operator
-  = "AND" / "&&"
+  = and / "&&"
 
 or_operator
-  = "OR" / "||"
+  = or / "||"
 
 unary_boolean_operator
-  = "NOT" / "!"
+  = not / "!"
 
 literal
   = int
