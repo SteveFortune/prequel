@@ -19,9 +19,10 @@ start
   = query
 
 query
-  = select:select_clause where:where_clause? group:group_clause? order:order_clause? limit:limit_clause? {
+  = select:select_clause where:where_clause? group:group_clause? having:having_clause? order:order_clause? limit:limit_clause? {
     if(where) select.where = where;
     if(group) select.group = group;
+    if(having) select.having = having;
     if(order) select.order = order;
     if(limit) select.limit = limit;
     return select;
@@ -38,6 +39,12 @@ where_condition
 
 group_clause
   = _ group_by _ fields:identifier_list { return { fields } }
+
+having_clause
+  = _ having _ condition:having_condition { return condition }
+
+having_condition
+  = expression
 
 order_clause
   = _ order_by _ order:order_tuple_list { return order }
@@ -62,9 +69,10 @@ select = "SELECT"i
 from = "FROM"i
 where = "WHERE"i
 group_by = "GROUP BY"i
+having = "HAVING"i
 order_by = "ORDER BY"i
 limit = "LIMIT"i
-as = "AS"i 
+as = "AS"i
 asc = "ASC"i { return T() }
 desc = "DESC"i { return T() }
 
@@ -147,7 +155,8 @@ base_expression
   / lp expr:expression rp { return expr }
 
 operand
-  = literal:literal { return { literal } }
+  = agg:aggregated_field { return agg }
+  / literal:literal { return { literal } }
   / identifier:identifier { return { identifier } }
 
 

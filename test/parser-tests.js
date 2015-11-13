@@ -201,3 +201,9 @@ test("LIMIT offset count", t => {
   t.deepEqual(out.limit, { offset: 5, count: 10 });
   t.end();
 });
+
+test("HAVING COUNT(x) > 10", t => {
+  const out = parseInsensitive(t, "SELECT f, COUNT(x) FROM x GROUP BY y HAVING COUNT(x) > 10");
+  t.deepEqual(out.having, { lhs: { source: "x", aggregate: "COUNT" }, op: ">", rhs: { literal: 10 } });
+  t.end();
+});
