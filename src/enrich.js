@@ -1,10 +1,22 @@
 import { indexBy, isFunction } from "./util";
+import { getOutputFieldName } from "./field-names";
 
-export default function makeResolve(query, data) {
+function getOutputFields({ fields }) {
+  return fields.map(field => Object.assign({}, field, {
+    outputName: getOutputFieldName(field)
+  }));
+}
+
+// TODO
+function getAggregations() {
+  return [];
+}
+
+export default function enrich(query, data) {
   const withAlias = query.fields.filter(f => f.as);
   const aliases = indexBy(withAlias, "as");
 
-  return function resolve(identifier, row, rowNumber) {
+  function resolve(identifier, row, rowNumber) {
     // Field with name `identifier`
     if(row[identifier]) {
       return row[identifier];
@@ -22,5 +34,12 @@ export default function makeResolve(query, data) {
     }
 
     return undefined;
-  };
+  }
+
+  // TODO query should be a property
+  return Object.assign(query, {
+    resolve,
+    aggregations: getAggregations(query),
+    fields: getOutputFields(query)
+  });
 }

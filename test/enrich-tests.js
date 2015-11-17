@@ -1,5 +1,5 @@
 import test from "tape";
-import makeResolve from "../src/resolve";
+import enrich from "../src/enrich";
 
 const fields = [
   { "name": "a" },
@@ -16,7 +16,7 @@ const data = {
 };
 
 test("resolve precendence", (t) => {
-  const resolve = makeResolve({ fields }, data);
+  const { resolve } = enrich({ fields }, data);
   const row = { a: "A", b: "B", c: "C" };
 
   t.equal(resolve("a", row), "A");

@@ -1,7 +1,8 @@
 import { groupBy, mapObject, pickKeys, sortByOrder } from "./util";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
-import buildResolve from "./resolve";
+import { getAggregateFieldName } from "./field-names";
+import enrichQuery from "./enrich";
 
 const DEFAULT_SORT_ORDER = "asc";
 
@@ -11,24 +12,12 @@ export default function executeQuery(parsedQuery, data) {
 
   const filtered = where(input, query);
   const aggregated = group(filtered, query);
-  const ordered = order(aggregated, query);
+  const postFiltered = having(aggregated, query);
+  const ordered = order(postFiltered, query);
   const limited = limit(ordered, query);
   const projected = select(limited, query);
 
   return projected;
-}
-
-function enrichQuery(parsedQuery, data) {
-  return Object.assign({}, parsedQuery, {
-    fields: getOutputFields(parsedQuery),
-    resolve: buildResolve(parsedQuery, data)
-  });
-}
-
-function getOutputFields({ fields }) {
-  return fields.map(field => Object.assign({}, field, {
-    outputName: getOutputFieldName(field)
-  }));
 }
 
 function select(target, { fields }) {
@@ -60,20 +49,6 @@ function getOutputValue(field, row) {
   }
 }
 
-function getOutputFieldName(field) {
-  if(field.as) {
-    return field.as;
-  } else if(field.aggregate) {
-    return getAggregateOutputFieldName(field);
-  } else {
-    return field.name;
-  }
-}
-
-function getAggregateOutputFieldName(field) {
-  return `${field.aggregate.toLowerCase()}_${field.source}`;
-}
-
 function selectAll(target) {
   return target;
 }
@@ -92,7 +67,6 @@ function filter(input, condition, resolve) {
 }
 
 // Return a function that evaluates an expression for the given input
-
 function buildExpression(expr, resolve) {
   if(expr.op) {
     const func = buildOperatorExpression(expr, resolve);
@@ -105,6 +79,9 @@ function buildExpression(expr, resolve) {
     return () => expr.literal;
   } else if (expr.reference) {
     return (row, rowNum) => resolve(expr.reference, row, rowNum);
+  } else if (expr.aggregate) {
+    const identifier = getAggregateFieldName(expr);
+    return (row, rowNum) => resolve(identifier, row, rowNum);
   } else {
     throw new Error(`unexpected expression: ${JSON.stringify(expr)}`);
   }
@@ -172,6 +149,14 @@ function aggregate(groupRows, field, aggregateName) {
 
 function getDefaultGroupValue(groupRows, field) {
   return groupRows[0][field.name];
+}
+
+function having(input, { having: condition, resolve }) {
+  if(condition) {
+    return filter(input, condition, resolve);
+  } else {
+    return input;
+  }
 }
 
 function order(input, { order: fieldOrders }) {
