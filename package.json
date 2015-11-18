@@ -10,6 +10,11 @@
     "coverage": "istanbul cover babel-node ./test/e2e-tests.js",
     "clean": "rm build/*"
   },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jwhitfieldseed/prequel.git"
