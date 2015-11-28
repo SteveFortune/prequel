@@ -7,8 +7,8 @@
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
     "pretest": "npm run build-parser",
     "test": "babel-node $(which tape) \"./test/**/*.js\" | faucet",
-    "coverage": "istanbul cover babel-node ./test/e2e-tests.js",
-    "clean": "rm build/*"
+    "coverage": "nyc npm test",
+    "clean": "rm -r build/* coverage"
   },
   "browserify": {
     "transform": [
@@ -40,6 +40,7 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.17",
     "lodash": "^3.10.0",
+    "nyc": "^4.0.0-alpha",
     "pegjs": "^0.8.0",
     "sql.js": "^0.2.21",
     "tape": "^4.0.1"
