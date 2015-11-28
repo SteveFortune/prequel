@@ -6,7 +6,8 @@
   "scripts": {
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
     "pretest": "npm run build-parser",
-    "test": "nyc tape \"./test/**/*.js\" | faucet && nyc report --reporter text --reporter lcov",
+    "test": "nyc tape \"./test/**/*.js\" | faucet && nyc report --reporter text",
+    "coveralls": "nyc report --reporter text-lcov | coveralls",
     "clean": "rm -rf build/* coverage"
   },
   "browserify": {
@@ -44,6 +45,7 @@
     "babel-cli": "^6.2.0",
     "babel-core": "^6.2.1",
     "babel-preset-es2015": "^6.1.18",
+    "coveralls": "^2.11.4",
     "faucet": "0.0.1",
     "istanbul": "^0.3.17",
     "lodash": "^3.10.0",
