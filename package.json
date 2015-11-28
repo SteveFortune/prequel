@@ -6,14 +6,21 @@
   "scripts": {
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
     "pretest": "npm run build-parser",
-    "test": "babel-node $(which tape) \"./test/**/*.js\" | faucet",
-    "coverage": "nyc npm test",
-    "clean": "rm -r build/* coverage"
+    "test": "nyc tape \"./test/**/*.js\" | faucet && nyc report --reporter text --reporter lcov",
+    "clean": "rm -rf build/* coverage"
   },
   "browserify": {
     "transform": [
       "babelify"
     ]
+  },
+  "config": {
+    "nyc": {
+      "require": [
+        "babel-register",
+        "babel-polyfill"
+      ]
+    }
   },
   "repository": {
     "type": "git",
@@ -40,7 +47,7 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.17",
     "lodash": "^3.10.0",
-    "nyc": "^4.0.0-alpha",
+    "nyc": "git+ssh://git@github.com:bcoe/nyc.git#babel",
     "pegjs": "^0.8.0",
     "sql.js": "^0.2.21",
     "tape": "^4.0.1"
