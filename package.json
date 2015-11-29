@@ -49,10 +49,10 @@
     "babel-register": "^6.2.0",
     "coveralls": "^2.11.4",
     "faucet": "0.0.1",
-    "istanbul": "^0.3.17",
+    "istanbul": "^0.4.1",
     "lodash": "^3.10.0",
     "nyc": "^4.0.0",
-    "pegjs": "^0.8.0",
+    "pegjs": "^0.9.0",
     "sql.js": "^0.2.21",
     "tape": "^4.0.1"
   }
