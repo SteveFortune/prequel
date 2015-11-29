@@ -51,7 +51,7 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.17",
     "lodash": "^3.10.0",
-    "nyc": "https://github.com/bcoe/nyc.git#babel",
+    "nyc": "^4.0.0",
     "pegjs": "^0.8.0",
     "sql.js": "^0.2.21",
     "tape": "^4.0.1"
