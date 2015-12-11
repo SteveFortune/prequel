@@ -10,7 +10,7 @@ import { testData } from "./test-harness";
 //  to do that at the moment (eval fails on iojs 2.x).
 
 function* iterableInput() {
-  for(let value of testData) {
+  for(const value of testData) {
     yield value;
   }
 }

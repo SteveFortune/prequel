@@ -9,6 +9,9 @@
   "rules": {
     "no-use-before-define": [0],
     "no-var": [2],
-    "curly": [2, "multi-line"]
+    "curly": [2, "multi-line"],
+    "quotes": [2, "double", "avoid-escape"],
+    "semi": [2],
+    "prefer-const": 2
   }
 }

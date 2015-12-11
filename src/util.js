@@ -13,7 +13,7 @@ function reduceToObject(inputArray, getKey, getValue) {
 
 export function groupBy(inputArray, getKey) {
   return reduceToObject(inputArray, getKey, (valuesWithKey, key, e) => {
-    let group = valuesWithKey || [];
+    const group = valuesWithKey || [];
     group.push(e);
     return group;
   });
@@ -33,7 +33,7 @@ export function mapObject(inputObject, func) {
 
 export function pickKeys(inputObject, keys) {
   const output = {};
-  for(let key of keys) {
+  for(const key of keys) {
     if(inputObject.hasOwnProperty(key)) {
       output[key] = inputObject[key];
     }

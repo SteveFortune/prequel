@@ -32,7 +32,7 @@ function selectFields(target, fields) {
 
 function projectFields(row, fields) {
   const out = {};
-  for(let field of fields) {
+  for(const field of fields) {
     out[field.outputName] = getOutputValue(field, row);
   }
 

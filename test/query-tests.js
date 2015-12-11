@@ -3,7 +3,7 @@ import test from "tape";
 import query from "../src/query";
 
 function* wrap(inputArray) {
-  for(let value of inputArray) {
+  for(const value of inputArray) {
     yield value;
   }
 }
@@ -95,7 +95,7 @@ test("WHERE referenced truthy value", (t) => {
 
 test("WHERE referenced function is called with each row and row number", (t) => {
   // check row number values
-  let seenRows = [];
+  const seenRows = [];
   const predicate = (row, n) => {
     seenRows.push(n);
     return row.a % 2;
