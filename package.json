@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
-    "pretest": "npm run lint && npm run build-parser",
+    "pretest": "npm run build-parser",
     "test": "nyc tape \"./test/**/*.js\" | faucet && nyc report --reporter text",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
     "clean": "rm -rf build/* coverage .nyc_output",
-    "lint": "eslint **/*.js"
+    "lint": "eslint **/*.js",
+    "node": "babel-node"
   },
   "browserify": {
     "transform": [

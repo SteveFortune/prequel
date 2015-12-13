@@ -116,33 +116,38 @@ function group(input, query) {
   }
 }
 
-function aggregateByGroup(input, { fields: outputFields, group: groupOptions }) {
+function aggregateByGroup(input, { fields, aggregations, group: groupOptions }) {
   const rowGroups = groupBy(input, row => getGroupKey(row, groupOptions.fields));
-  return mapObject(rowGroups, rows => getGroupOutputRow(rows, outputFields));
+  return mapObject(rowGroups, rows => getGroupOutputRow(rows, { fields, aggregations }));
 }
 
-function aggregateOverall(input, { fields }) {
-  return [getGroupOutputRow(input, fields)];
+function aggregateOverall(input, query) {
+  return [getGroupOutputRow(input, query)];
 }
 
 function getGroupKey(row, groupFields) {
   return JSON.stringify(pickKeys(row, groupFields));
 }
 
-function getGroupOutputRow(groupRows, outputFields) {
-  return outputFields.reduce((row, field) => {
-
-    const outputValue = field.aggregate
-      ? aggregate(groupRows, field, field.aggregate)
-      : getDefaultGroupValue(groupRows, field);
-
-    row[field.outputName] = outputValue;
+function getGroupOutputRow(groupRows, { fields, aggregations }) {
+  // Aggregations are planned on the enriched query, so don't consider them here
+  // TODO better encapuslated if we dedupe directly against aggregations.
+  const nonAggregatedFields = fields.filter(field => !field.aggregate);
+  const nonAggregatedValues = nonAggregatedFields.reduce((row, field) => {
+    row[field.outputName] = getDefaultGroupValue(groupRows, field);
     return row;
   }, {});
+
+  const aggregatedValues = aggregations.reduce((row, agg) => {
+    row[agg.outputName] = aggregate(groupRows, agg.source, agg.aggregate);
+    return row;
+  }, {});
+
+  return Object.assign({}, nonAggregatedValues, aggregatedValues);
 }
 
-function aggregate(groupRows, field, aggregateName) {
-  const inputValues = groupRows.map(row => row[field.source]);
+function aggregate(groupRows, fieldName, aggregateName) {
+  const inputValues = groupRows.map(row => row[fieldName]);
   const func = getAggregateFunction(aggregateName);
   return func(inputValues);
 }

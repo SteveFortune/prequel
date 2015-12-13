@@ -1,5 +1,6 @@
 import { indexBy, isFunction } from "./util";
-import { getOutputFieldName } from "./field-names";
+import { getOutputFieldName, getAggregateFieldName } from "./field-names";
+import getAggregateFunction from "./aggregates";
 
 function getOutputFields({ fields }) {
   return fields.map(field => Object.assign({}, field, {
@@ -7,9 +8,28 @@ function getOutputFields({ fields }) {
   }));
 }
 
-// TODO
-function getAggregations() {
-  return [];
+// Return flat array of aggregations from a having expression
+function collectAggs(expr) {
+  const aggs = [];
+  if(expr.aggregate) aggs.push(expr);
+  if(expr.lhs) aggs.push(...collectAggs(expr.lhs));
+  if(expr.rhs) aggs.push(...collectAggs(expr.rhs));
+
+  return aggs;
+}
+
+function getAggregations(query) {
+  const fieldAggs = query.fields
+    .filter(field => field.aggregate);
+
+  // TODO don't include aggs that are already computed in fieldAggs
+  const havingAggs = query.having
+    ? collectAggs(query.having)
+    : [];
+
+  return fieldAggs.concat(...havingAggs)
+    .map(agg => Object.assign({}, agg, { outputName: getOutputFieldName(agg) }));
+
 }
 
 export default function enrich(query, data) {

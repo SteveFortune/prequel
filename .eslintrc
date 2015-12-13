@@ -12,6 +12,8 @@
     "curly": [2, "multi-line"],
     "quotes": [2, "double", "avoid-escape"],
     "semi": [2],
-    "prefer-const": 2
+    "prefer-const": 2,
+    "no-debugger": 2,
+    "no-console": 2
   }
 }

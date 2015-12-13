@@ -86,7 +86,7 @@ testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age 
 
 // HAVING
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names, AVG(unread) as u FROM ${table} GROUP BY age HAVING names > 1 AND u < 10 ORDER BY age`);
-// testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 ORDER BY age`, { only: 1, log: 1 });
+testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 ORDER BY age`);
 // testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 ORDER BY age`);
 // testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 AND AVG(unread) > 1 ORDER BY age`);
 
