@@ -97,8 +97,9 @@ testQuery(`SELECT greeting FROM ${table} ORDER BY greeting DESC`);
 testQuery(`SELECT * FROM ${table} ORDER BY age, company DESC, isActive ASC`);
 
 // GROUP BY
-// TODO test GROUP BY + ORDER BY
-// testQuery(`SELECT fruit AS food, age FROM ${table} GROUP BY fruit, age`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT fruit AS food, MAX(age) FROM ${table} GROUP BY food`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT fruit AS food, MAX(age) FROM ${table} GROUP BY fruit`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT fruit AS food, age AS oldness FROM ${table} GROUP BY food, age`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT company, COUNT(name), MAX(age) FROM ${table} GROUP BY company`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT company, COUNT(age), COUNT(DISTINCT age) FROM ${table} GROUP BY company`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT COUNT(*) FROM ${table} GROUP BY fruit`, { test: matchGroupsInAnyOrder });
