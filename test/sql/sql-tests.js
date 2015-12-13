@@ -29,29 +29,48 @@ function deepEqual(t, prequelResult, dbResult) {
   t.end();
 }
 
-// * Allow the keys COUNT(DISTINCT a) and count_distinct_a to be treated as the same
-// * Some of these cases also need order-independent matching...
-// FIXME
+// Normalise sqlite results to cope with expected differences:
+//  - prequel uses non-standard default aggregation field names:
+//    COUNT(f) => count_f
+// Don't use parenthesies for non-group field aliases to avoid confusing
+//  this normalisation!
+function normalizeDbResults(inputResults) {
+  return inputResults
+    .map(inputRow => {
+      const outputRow = {};
+      for (const field in inputRow) {
+        const outputField = (field.match(/\(.+\)/))
+          ? normalizeGroupName(field)
+          : field;
 
-// function matchGroups(t, prequelResults, dbResults) {
-//   const valuesMatch = prequelResults.every((result, i) =>
-//     t.deepEqual(_.values(result), _.values(dbResults[i])));
-//
-//   const keysMatch = prequelResults.every((prequelResult, i) => {
-//     const dbResult = dbResults[i];
-//
-//     return _(dbResult).keys().all(key => {
-//       if(prequelResult[key]) return true;
-//       const prequelKey = key.replace(/\(| /g, "_").slice(0, -1);
-//       return prequelResult[prequelKey];
-//     }).value();
-//   });
-//
-//   t.true(valuesMatch);
-//   t.true(keysMatch);
-//
-//   t.end();
-// }
+        outputRow[outputField] = inputRow[field];
+      }
+
+      return outputRow;
+    });
+}
+
+function normalizeGroupName(sqlName) {
+  return sqlName
+    .toLowerCase()
+    .replace(/\s|\(/g, '_')
+    .replace(/\)/g, '');
+}
+
+// Match the output of GROUP BY queries:
+//  - normalise aggregation field name
+// Group order must match. By default prequel does not order groups
+//  (unlike many SQL engines, which implicitly ORDER BY the GROUP BY columns).
+//  use matchGroupsInAnyOrder to allow order-insensitive matching.
+function matchGroups(t, prequelResults, dbResults, normalize=_.identity) {
+  return deepEqual(t, normalize(prequelResults), normalize(normalizeDbResults(dbResults)));
+}
+
+// Match GROUP BY results in any order.
+function matchGroupsInAnyOrder(t, prequelResults, dbResults) {
+  return matchGroups(t, prequelResults, dbResults, (results) => results.map(row => JSON.stringify(row)).sort())
+}
+
 
 // SELECT
 testQuery(`SELECT name FROM ${table}`);
@@ -67,8 +86,8 @@ testQuery(`SELECT name, greeting FROM ${table} WHERE unread > 20`);
 // Overall aggregation
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);
 testQuery(`SELECT AVG(age) AS avg_age FROM ${table}`);
-// testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups});
-// testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroups });
+// testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups}); // FIXME fails on default agg - sqlite seems to use LAST
+testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroupsInAnyOrder });
 
 
 // ORDER BY
@@ -78,10 +97,11 @@ testQuery(`SELECT greeting FROM ${table} ORDER BY greeting DESC`);
 testQuery(`SELECT * FROM ${table} ORDER BY age, company DESC, isActive ASC`);
 
 // GROUP BY
-// testQuery(`SELECT fruit AS food, age FROM ${table} GROUP BY fruit, age`, { test: matchGroups });
-// testQuery(`SELECT company, COUNT(name), MAX(age) FROM ${table} GROUP BY company`, { test: matchGroups });
-// testQuery(`SELECT company, COUNT(age), COUNT(DISTINCT age) FROM ${table} GROUP BY company`, { test: matchGroups });
-// testQuery(`SELECT COUNT(*) FROM ${table} GROUP BY fruit`, { test: matchGroups });
+// TODO test GROUP BY + ORDER BY
+// testQuery(`SELECT fruit AS food, age FROM ${table} GROUP BY fruit, age`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT company, COUNT(name), MAX(age) FROM ${table} GROUP BY company`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT company, COUNT(age), COUNT(DISTINCT age) FROM ${table} GROUP BY company`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT COUNT(*) FROM ${table} GROUP BY fruit`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age ORDER BY age`);
 
 // HAVING
@@ -101,7 +121,4 @@ testQuery(`SELECT * FROM ${table} ORDER BY name DESC LIMIT 4`);
 testQuery(`SELECT age, COUNT(name) AS count, COUNT(DISTINCT company) AS distinct_companies FROM ${table} GROUP BY age ORDER BY age DESC LIMIT 1, 1`);
 testQuery(`select age, count(name) AS count, count(distinct company) AS distinct_companies FROM ${table} group by age order by age desc limit 1, 1`);
 
-// TODO:
-// * sorting, grouping by alias
-// * write test function for matching COUNT(DISTINCT a) and count_distinct_a
-// * test for matching with/without strict order (e.h. GROUP BY without ORDER BY)
+// TODO more!
