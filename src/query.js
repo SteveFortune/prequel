@@ -130,16 +130,24 @@ function getGroupKey(row, groupFields) {
 }
 
 function getGroupOutputRow(groupRows, { fields, aggregations }) {
-  // Aggregations are planned on the enriched query, so don't consider them here
-  // TODO better encapuslated if we dedupe directly against aggregations.
-  const nonAggregatedFields = fields.filter(field => !field.aggregate);
-  const nonAggregatedValues = nonAggregatedFields.reduce((row, field) => {
-    row[field.outputName] = getDefaultGroupValue(groupRows, field);
-    return row;
-  }, {});
+  // Non-aggregated values are included:
+  // - GROUP BY fields have the same value for each row in a group
+  // - Non-grouped, non-aggregated fields are implicitly aggregated.
+  // The same default aggregation covers both cases.
+  const nonAggregatedValues = fields
+    .filter(field => !field.aggregate)
+    .reduce((row, field) => {
+      row[field.outputName] = getDefaultGroupValue(groupRows, field);
+      return row;
+    }, {});
 
   const aggregatedValues = aggregations.reduce((row, agg) => {
-    row[agg.outputName] = aggregate(groupRows, agg.source, agg.aggregate);
+    // Aggregations can have several output field names
+    // (e.g. SELECT COUNT(name) AS a HAVING COUNT(name) > 10 uses
+    //  the same COUNT(name) as the default name and `a`.
+    const values = aggregate(groupRows, agg.source, agg.aggregate);
+    agg.outputFields.forEach(outputField => { row[outputField] = values; });
+
     return row;
   }, {});
 

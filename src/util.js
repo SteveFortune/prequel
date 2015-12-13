@@ -41,3 +41,7 @@ export function pickKeys(inputObject, keys) {
 
   return output;
 }
+
+export function objectValues(inputObject) {
+  return Object.keys(inputObject).map(key => inputObject[key]);
+}

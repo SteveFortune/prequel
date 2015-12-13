@@ -1,4 +1,4 @@
-import { indexBy, isFunction } from "./util";
+import { indexBy, isFunction, objectValues } from "./util";
 import { getOutputFieldName, getAggregateFieldName } from "./field-names";
 import getAggregateFunction from "./aggregates";
 
@@ -18,18 +18,36 @@ function collectAggs(expr) {
   return aggs;
 }
 
+// Deduplicate aggregations with the same aggregation function
+//  and source field. Each grouped aggregation has a Set of
+//  output field names.
+function mergeAggs(inputAggs) {
+  const aggsByKey = inputAggs.reduce((merged, agg) => {
+    const key = getAggregateFieldName(agg);
+    const mergedKeyAgg = merged[key] || (merged[key] = {
+      aggregate: agg.aggregate,
+      source: agg.source,
+      outputFields: new Set()
+    });
+
+    const outputField = getOutputFieldName(agg);
+    mergedKeyAgg.outputFields.add(outputField);
+
+    return merged;
+  }, {});
+
+  return objectValues(aggsByKey);
+}
+
 function getAggregations(query) {
   const fieldAggs = query.fields
     .filter(field => field.aggregate);
 
-  // TODO don't include aggs that are already computed in fieldAggs
   const havingAggs = query.having
     ? collectAggs(query.having)
     : [];
 
-  return fieldAggs.concat(...havingAggs)
-    .map(agg => Object.assign({}, agg, { outputName: getOutputFieldName(agg) }));
-
+  return mergeAggs(fieldAggs.concat(...havingAggs));
 }
 
 export default function enrich(query, data) {
