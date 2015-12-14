@@ -71,7 +71,20 @@ test("WHERE unary condition", (t) => {
   t.end();
 });
 
-test("WHERE boolean condition", (t) => {
+// NOT's argument is parsed as LHS because it simplifies evaluation semantics
+test("WHERE NOT", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE NOT a = 2");
+  t.deepEqual(out.where, { lhs: { lhs: { identifier: "a" }, op: "=", rhs: { literal: 2 } }, op: "NOT" });
+  t.end();
+});
+
+test("WHERE !", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE ! a = 2");
+  t.deepEqual(out.where, { lhs: { lhs: { identifier: "a" }, op: "=", rhs: { literal: 2 } }, op: "!" });
+  t.end();
+});
+
+test("WHERE binary boolean condition", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE f1 = 10 AND f2 > 5");
   t.deepEqual(out.where, {
     op: "AND",
@@ -102,6 +115,18 @@ test("AND has higher precedence than OR", (t) => {
   const e3 = { lhs: { identifier: "f3" }, op: "IS NOT NULL" };
 
   const expected = { op: "OR", lhs: e1, rhs: { op: "AND", lhs: e2, rhs: e3 } };
+
+  t.deepEqual(out.where, expected);
+  t.end();
+});
+
+test("NOT has higher precedence than AND", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE f1 = 1 AND NOT f2 > 2");
+
+  const e1 = { lhs: { identifier: "f1" }, op: "=", rhs: { literal: 1 } };
+  const e2 = { lhs: { identifier: "f2" }, op: ">", rhs: { literal: 2 } };
+
+  const expected = { op: "AND", lhs: e1, rhs: { op: "NOT", lhs: e2 } };
 
   t.deepEqual(out.where, expected);
   t.end();

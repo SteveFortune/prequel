@@ -146,7 +146,8 @@ and_expression
   = first:base_expression rest:(_ op:and_operator _ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
 
 operator_expression
-  = lhs:operand _ op:unary_operator { return { lhs, op } }
+  = not:not_expression { return not }
+  / lhs:operand _ op:unary_operator { return { lhs, op } }
   / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
   / reference:identifier { return { reference } }
 
@@ -159,6 +160,10 @@ operand
   / literal:literal { return { literal } }
   / identifier:identifier { return { identifier } }
 
+// modelling the operand as lhs makes evaluation simpler
+// since it can be assumed that all operators have at least an LHS argument.
+not_expression
+  = op:not_operator _ lhs:base_expression { return { op, lhs } }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
@@ -180,7 +185,7 @@ and_operator
 or_operator
   = or / "||"
 
-unary_boolean_operator
+not_operator
   = not / "!"
 
 literal
