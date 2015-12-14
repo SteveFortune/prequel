@@ -53,8 +53,8 @@ function normalizeDbResults(inputResults) {
 function normalizeGroupName(sqlName) {
   return sqlName
     .toLowerCase()
-    .replace(/\s|\(/g, '_')
-    .replace(/\)/g, '');
+    .replace(/\s|\(/g, "_")
+    .replace(/\)/g, "");
 }
 
 // Match the output of GROUP BY queries:
@@ -68,7 +68,7 @@ function matchGroups(t, prequelResults, dbResults, normalize=_.identity) {
 
 // Match GROUP BY results in any order.
 function matchGroupsInAnyOrder(t, prequelResults, dbResults) {
-  return matchGroups(t, prequelResults, dbResults, (results) => results.map(row => JSON.stringify(row)).sort())
+  return matchGroups(t, prequelResults, dbResults, (results) => results.map(row => JSON.stringify(row)).sort());
 }
 
 

@@ -161,7 +161,13 @@ operand
 
 
 binary_operator
-  = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!="
+  = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / rlike
+
+rlike
+  = "RLIKE"i { return T() }
+  / "REGEXP"i { return T() }
+  / "=~"
+  / "~"
 
 unary_operator
   = is_null / is_not_null

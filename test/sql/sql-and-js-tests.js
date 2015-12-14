@@ -3,8 +3,7 @@ import test from "tape";
 import prequel from "../../";
 import { testData } from "./test-harness";
 
-// End-to-end tests for interpolated JavaScript and iterable input,
-//  since these features cannot be tested against sqljs.
+// End-to-end tests for prequel features that cannot be tested directly against sqlite.
 // Ideally these tests would run against array and iterable input, and use the
 //  query string as the test name like sql-tests, but I can't figure out how
 //  to do that at the moment (eval fails on iojs 2.x).
@@ -43,5 +42,19 @@ test("SELECT * FROM ${iterableInput()} WHERE ${row => row.name.length > 15} AND 
 test("prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}`", (t) => {
   const result = prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}`;
   t.deepEqual([26, 27, 28, 29], result.map(r => r.id));
+  t.end();
+});
+
+// sqlite does not support REGEXP et al
+test("prequel`SELECT name FROM ${testData} WHERE name REGEXP 'i'`", (t) => {
+  const result = prequel`SELECT name FROM ${testData} WHERE name REGEXP '[ou]ff'`;
+  t.deepEqual(["Margie Duffy", "Hoffman Grant"], result.map(r => r.name));
+  t.end();
+});
+
+// ~ alias and JS regexp with flags
+test("prequel`SELECT name FROM ${testData} WHERE name ~ ${/[mn] [gd]/i}`", (t) => {
+  const result = prequel`SELECT name FROM ${testData} WHERE name ~ ${/[mn] [gd]/i}`;
+  t.deepEqual(["Ellen Gould", "Chapman Gibbs", "Hoffman Grant"], result.map(r => r.name));
   t.end();
 });

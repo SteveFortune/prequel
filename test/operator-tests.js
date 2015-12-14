@@ -139,3 +139,27 @@ test("! is the same as NOT", (t) => {
   t.false(bang(1));
   t.end();
 });
+
+test("REGEXP", (t) => {
+  const rlike = operators["REGEXP"];
+  t.true(rlike("hello", "ll"));
+  t.false(rlike("hello", "LL"));
+  t.true(rlike("hello", new RegExp("LL", "i")));
+  // TODO inline /pattern/flags strings
+  t.end();
+});
+
+test("RLIKE is the same as REGEXP", (t) => {
+  t.equal(operators["RLIKE"], operators["REGEXP"]);
+  t.end();
+});
+
+test("=~ is the same as REGEXP", (t) => {
+  t.equal(operators["RLIKE"], operators["REGEXP"]);
+  t.end();
+});
+
+test("~ is the same as REGEXP", (t) => {
+  t.equal(operators["RLIKE"], operators["REGEXP"]);
+  t.end();
+});
