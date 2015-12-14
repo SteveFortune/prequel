@@ -82,6 +82,10 @@ testQuery(`select name as nom, age FROM ${table}`);
 
 // WHERE
 testQuery(`SELECT name, greeting FROM ${table} WHERE unread > 20`);
+testQuery(`SELECT name FROM ${table} WHERE name LIKE "%"`);
+testQuery(`SELECT name FROM ${table} WHERE name LIKE "_arg%"`);
+testQuery(`SELECT name FROM ${table} WHERE name LIKE "\\%"`);
+testQuery(`SELECT name FROM ${table} WHERE name LIKE "%ole_a%"`);
 
 // Overall aggregation
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);

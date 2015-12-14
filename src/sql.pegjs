@@ -161,7 +161,9 @@ operand
 
 
 binary_operator
-  = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / rlike
+  = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
+
+like = "LIKE"i { return T() }
 
 rlike
   = "RLIKE"i { return T() }

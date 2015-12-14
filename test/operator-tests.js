@@ -163,3 +163,22 @@ test("~ is the same as REGEXP", (t) => {
   t.equal(operators["RLIKE"], operators["REGEXP"]);
   t.end();
 });
+
+test("LIKE", (t) => {
+  const like = operators["LIKE"];
+
+  t.equal(like("brocolli", "%ll_"), true);
+  t.equal(like("brocolli", "%lli%"), true);
+  t.equal(like("brocolli", "%lli_"), false);
+  t.equal(like("50% rise", "%\\%%"), true);
+  t.equal(like("50 percent rise", "%\\%%"), false);
+  t.equal(like("snake_case", "snak_\\__ase"), true);
+  t.equal(like("camelCase", "camel_ase"), true);
+  t.equal(like("camelCase", "camel\\_ase"), false);
+  t.equal(like("c:\\users\\joe", "C:\\"), true);
+  t.equal(like("c:\\users\\joe", "C:\\%"), false);
+  t.equal(like("c:\\users\\joe", "C:\\\\%joe"), true);
+  t.equal(like("c:\\users\\joe", "C:\\\\%amy"), false);
+
+  t.end();
+});
