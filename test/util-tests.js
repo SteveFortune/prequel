@@ -1,5 +1,5 @@
 import test from "tape";
-import { groupBy, indexBy, isFunction, mapObject, pickKeys, objectValues } from "../src/util";
+import { groupBy, indexBy, isFunction, mapObject, pickKeys, objectValues, exists } from "../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];
@@ -75,5 +75,17 @@ test("pickKeys", (t) => {
 test("objectValues", (t) => {
   const input = { a: 1, b: 2, c: 3, d: 4 };
   t.deepEqual(objectValues(input), [1, 2, 3, 4]);
+  t.end();
+});
+
+test("exists", (t) => {
+  t.true(exists(1));
+  t.true(exists({}));
+  t.true(exists([]));
+  t.true(exists(0));
+  t.true(exists(false));
+  t.true(exists(null));
+  t.false(exists(undefined));
+  t.false(exists());
   t.end();
 });

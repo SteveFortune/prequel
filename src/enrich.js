@@ -1,4 +1,4 @@
-import { indexBy, isFunction, objectValues } from "./util";
+import { indexBy, isFunction, objectValues, exists } from "./util";
 import { getOutputFieldName, getAggregateFieldName } from "./field-names";
 import getAggregateFunction from "./aggregates";
 
@@ -56,18 +56,18 @@ export default function enrich(query, data) {
 
   function resolve(identifier, row, rowNumber) {
     // Field with name `identifier`
-    if(row[identifier]) {
+    if(exists(row[identifier])) {
       return row[identifier];
     }
 
     // Field with alias `identifier`
-    if(aliases[identifier]) {
+    if(exists(aliases[identifier])) {
       return row[aliases[identifier].name];
     }
 
     // Referenced datum with key `identifier`
     const datum = data[identifier];
-    if(datum) {
+    if(exists(datum)) {
       return isFunction(datum) ? datum(row, rowNumber) : datum;
     }
 

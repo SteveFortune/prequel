@@ -20,33 +20,23 @@ export default function executeQuery(parsedQuery, data) {
   return projected;
 }
 
-function select(target, { fields }) {
-  return fields.length === 0
+function select(target, query) {
+  return query.fields.length === 0
     ? selectAll(target)
-    : selectFields(target, fields);
+    : selectFields(target, query);
 }
 
-function selectFields(target, fields) {
-  return target.map(row => projectFields(row, fields));
+function selectFields(target, query) {
+  return target.map(row => projectFields(row, query));
 }
 
-function projectFields(row, fields) {
+function projectFields(row, { fields, resolve }) {
   const out = {};
   for(const field of fields) {
-    out[field.outputName] = getOutputValue(field, row);
+    out[field.outputName] = resolve(field.outputName, row);
   }
 
   return out;
-}
-
-function getOutputValue(field, row) {
-  if(field.name) {
-    return row[field.name];
-  } else if(field.aggregate) {
-    return row[field.outputName];
-  } else {
-    throw new Error(`Unexpected output field: ${JSON.stringify(field)}`);
-  }
 }
 
 function selectAll(target) {
@@ -116,20 +106,21 @@ function group(input, query) {
   }
 }
 
-function aggregateByGroup(input, { fields, aggregations, group: groupOptions }) {
-  const rowGroups = groupBy(input, row => getGroupKey(row, groupOptions.fields));
-  return mapObject(rowGroups, rows => getGroupOutputRow(rows, { fields, aggregations }));
+function aggregateByGroup(input, { fields, aggregations, resolve, group: groupOptions }) {
+  const rowGroups = groupBy(input, row => getGroupKey(row, groupOptions.fields, resolve));
+  return mapObject(rowGroups, rows => getGroupOutputRow(rows, { fields, aggregations, resolve }));
 }
 
 function aggregateOverall(input, query) {
   return [getGroupOutputRow(input, query)];
 }
 
-function getGroupKey(row, groupFields) {
-  return JSON.stringify(pickKeys(row, groupFields));
+function getGroupKey(row, groupFields, resolve) {
+  // return JSON.stringify(pickKeys(row, groupFields));
+  return JSON.stringify(groupFields.map(field => resolve(field, row)));
 }
 
-function getGroupOutputRow(groupRows, { fields, aggregations }) {
+function getGroupOutputRow(groupRows, { fields, aggregations, resolve }) {
   // Non-aggregated values are included:
   // - GROUP BY fields have the same value for each row in a group
   // - Non-grouped, non-aggregated fields are implicitly aggregated.
@@ -137,7 +128,7 @@ function getGroupOutputRow(groupRows, { fields, aggregations }) {
   const nonAggregatedValues = fields
     .filter(field => !field.aggregate)
     .reduce((row, field) => {
-      row[field.outputName] = getDefaultGroupValue(groupRows, field);
+      row[field.outputName] = getDefaultGroupValue(groupRows, field.name, resolve);
       return row;
     }, {});
 
@@ -145,7 +136,7 @@ function getGroupOutputRow(groupRows, { fields, aggregations }) {
     // Aggregations can have several output field names
     // (e.g. SELECT COUNT(name) AS a HAVING COUNT(name) > 10 uses
     //  the same COUNT(name) as the default name and `a`.
-    const values = aggregate(groupRows, agg.source, agg.aggregate);
+    const values = aggregate(groupRows, agg.source, agg.aggregate, resolve);
     agg.outputFields.forEach(outputField => { row[outputField] = values; });
 
     return row;
@@ -154,14 +145,14 @@ function getGroupOutputRow(groupRows, { fields, aggregations }) {
   return Object.assign({}, nonAggregatedValues, aggregatedValues);
 }
 
-function aggregate(groupRows, fieldName, aggregateName) {
-  const inputValues = groupRows.map(row => row[fieldName]);
+function aggregate(groupRows, fieldName, aggregateName, resolve) {
+  const inputValues = groupRows.map((row, i) => resolve(fieldName, row, i));
   const func = getAggregateFunction(aggregateName);
   return func(inputValues);
 }
 
-function getDefaultGroupValue(groupRows, field) {
-  return groupRows[0][field.name];
+function getDefaultGroupValue(groupRows, fieldName, resolve) {
+  return resolve(fieldName, groupRows[0], 0);
 }
 
 function having(input, { having: condition, resolve }) {
@@ -172,12 +163,15 @@ function having(input, { having: condition, resolve }) {
   }
 }
 
-function order(input, { order: fieldOrders }) {
+function order(input, { order: fieldOrders, resolve }) {
   if(fieldOrders) {
-    const fields = fieldOrders.map(o => o.field);
     const orders = fieldOrders.map(getSortOrder);
+    const getFields = fieldOrders
+      .map(order =>
+        row => resolve(order.field, row)
+      );
 
-    return sortByOrder(input, fields, orders);
+    return sortByOrder(input, getFields, orders);
   } else {
     return input;
   }
