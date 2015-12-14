@@ -132,6 +132,7 @@ is_not_null = "IS NOT NULL"i { return T() }
 and = "AND"i { return T() }
 or = "OR"i { return T() }
 not = "NOT"i { return T() }
+between = "BETWEEN"i { return T() }
 
 // Expressions use unrolled recursion
 // HT http://stackoverflow.com/a/30798758/2806996
@@ -149,6 +150,7 @@ operator_expression
   = not:not_expression { return not }
   / lhs:operand _ op:unary_operator { return { lhs, op } }
   / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
+  / between:between_expression { return between }
   / reference:identifier { return { reference } }
 
 base_expression
@@ -164,6 +166,11 @@ operand
 // since it can be assumed that all operators have at least an LHS argument.
 not_expression
   = op:not_operator _ lhs:base_expression { return { op, lhs } }
+
+// use "ths" for "third-hand-side" operand of ternary operator. Perhaps an ordered
+//  argument list would be clearer.
+between_expression
+  = lhs:operand _ op:between _ rhs:operand _ and _ ths:operand { return { op, lhs, rhs, ths } }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike

@@ -182,3 +182,12 @@ test("LIKE", (t) => {
 
   t.end();
 });
+
+test("BETWEEN", (t) => {
+  const between = operators["BETWEEN"];
+
+  t.true(between(1, 0, 2));
+  t.true(between(1, 1, 1));
+  t.false(between(1, 2, 3));
+  t.end();
+});

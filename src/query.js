@@ -1,4 +1,4 @@
-import { groupBy, mapObject, pickKeys, sortByOrder } from "./util";
+import { groupBy, mapObject, pickKeys, sortByOrder, exists } from "./util";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 import { getAggregateFieldName } from "./field-names";
@@ -79,16 +79,21 @@ function buildExpression(expr, resolve) {
 
 function buildOperatorExpression(expr, resolve) {
   const evaluateOperator = getOperator(expr.op);
+  const childNames = ["lhs", "rhs", "ths"];
 
-  const lhs = buildExpression(expr.lhs, resolve);
-  const rhs = expr.rhs
-    ? buildExpression(expr.rhs, resolve)
-    : undefined;
+  // ths: "third hand side" for ternary operators
+  const children = childNames
+    .map(arg => {
+      if (exists(expr[arg])) return buildExpression(expr[arg], resolve);
+    });
 
   return (row, rowNum) => {
-    const lhsResult = lhs(row, rowNum);
-    const rhsResult = rhs ? rhs(row, rowNum) : undefined;
-    return evaluateOperator(lhsResult, rhsResult);
+    const childResults = children
+      .map(child => {
+        if (exists(child)) return child(row, rowNum);
+      });
+
+    return evaluateOperator(...childResults);
   };
 }
 

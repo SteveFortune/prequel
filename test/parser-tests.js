@@ -71,6 +71,12 @@ test("WHERE unary condition", (t) => {
   t.end();
 });
 
+test("WHERE BETWEEN", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE a BETWEEN b AND c");
+  t.deepEqual(out.where, { lhs: { identifier: "a" }, op: "BETWEEN", rhs: { identifier: "b" }, ths: { identifier: "c" } });
+  t.end();
+});
+
 // NOT's argument is parsed as LHS because it simplifies evaluation semantics
 test("WHERE NOT", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE NOT a = 2");

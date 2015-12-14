@@ -89,6 +89,8 @@ testQuery(`SELECT name FROM ${table} WHERE name LIKE "%ole_a%"`);
 testQuery(`SELECT name FROM ${table} WHERE NOT name LIKE "%a%"`);
 testQuery(`SELECT name FROM ${table} WHERE age > 20 AND isActive = 1`);
 testQuery(`SELECT name FROM ${table} WHERE NOT age > 20 AND isActive = 1 OR (name LIKE "%a%" AND NOT name LIKE "%e%")`);
+testQuery(`SELECT name FROM ${table} WHERE age BETWEEN 20 and 22`);
+testQuery(`SELECT name FROM ${table} WHERE NOT age BETWEEN 20 and 22`);
 
 
 // Overall aggregation

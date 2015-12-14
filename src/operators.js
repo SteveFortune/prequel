@@ -42,7 +42,7 @@ const like = (value, wildcardPattern) => {
 
     const pattern = new RegExp(patternTokens.join(""), "i");
     return pattern.test(value);
-}
+};
 
 const operators = {
   "=": (a, b) => a === b,
@@ -54,6 +54,7 @@ const operators = {
   ">=": (a, b) => a >= b,
   "IS NULL": a => a == null,
   "IS NOT NULL": a => a != null,
+  "BETWEEN": (a, b, c) => a >= b && a <= c,
   "AND": and,
   "&&": and,
   "OR": or,
@@ -64,7 +65,7 @@ const operators = {
   "REGEXP": matches,
   "RLIKE": matches,
   "=~": matches,
-  "~": matches
+  "~": matches,
 };
 
 export default operators;
