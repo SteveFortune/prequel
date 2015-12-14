@@ -95,6 +95,8 @@ testQuery(`SELECT name, age FROM ${table} ORDER BY age`);
 testQuery(`SELECT name, isActive FROM ${table} ORDER BY age ASC`);
 testQuery(`SELECT greeting FROM ${table} ORDER BY greeting DESC`);
 testQuery(`SELECT * FROM ${table} ORDER BY age, company DESC, isActive ASC`);
+testQuery(`SELECT name, age AS a FROM ${table} ORDER BY age`);
+testQuery(`SELECT name, age AS a FROM ${table} ORDER BY a`);
 
 // GROUP BY
 testQuery(`SELECT fruit AS food, MAX(age) FROM ${table} GROUP BY food`, { test: matchGroupsInAnyOrder });

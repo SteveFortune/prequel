@@ -163,12 +163,15 @@ function having(input, { having: condition, resolve }) {
   }
 }
 
-function order(input, { order: fieldOrders }) {
+function order(input, { order: fieldOrders, resolve }) {
   if(fieldOrders) {
-    const fields = fieldOrders.map(o => o.field);
     const orders = fieldOrders.map(getSortOrder);
+    const getFields = fieldOrders
+      .map(order =>
+        row => resolve(order.field, row)
+      );
 
-    return sortByOrder(input, fields, orders);
+    return sortByOrder(input, getFields, orders);
   } else {
     return input;
   }
