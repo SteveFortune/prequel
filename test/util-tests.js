@@ -1,5 +1,5 @@
 import test from "tape";
-import { groupBy, indexBy, isFunction, mapObject, pickKeys, objectValues, exists } from "../src/util";
+import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists } from "../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];
@@ -55,6 +55,18 @@ test("isFunction", (t) => {
   t.true(isFunction(t.true));
   t.false(isFunction({}));
   t.false(isFunction([]));
+  t.end();
+});
+
+test("isArray", (t) => {
+  t.true(isArray([]));
+  t.true(isArray([[]]));
+  t.false(isArray());
+  t.false(isArray(null));
+  t.false(isArray({}));
+  t.false(isArray(1));
+  t.false(isArray("1"));
+
   t.end();
 });
 

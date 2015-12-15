@@ -55,6 +55,7 @@ const operators = {
   "IS NULL": a => a == null,
   "IS NOT NULL": a => a != null,
   "BETWEEN": (a, b, c) => a >= b && a <= c,
+  "IN": (a, b) =>  b.indexOf(a) >= 0,
   "AND": and,
   "&&": and,
   "OR": or,

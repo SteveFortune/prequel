@@ -77,6 +77,12 @@ test("WHERE BETWEEN", (t) => {
   t.end();
 });
 
+test("WHERE IN", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE a IN (1, 2)");
+  t.deepEqual(out.where, { lhs: { identifier: "a" }, op: "IN", rhs: [{ literal: 1 }, { literal: 2 }] });
+  t.end();
+});
+
 // NOT's argument is parsed as LHS because it simplifies evaluation semantics
 test("WHERE NOT", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE NOT a = 2");

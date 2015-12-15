@@ -1,4 +1,4 @@
-import { groupBy, mapObject, pickKeys, sortByOrder, exists } from "./util";
+import { groupBy, mapObject, pickKeys, sortByOrder, exists, isArray } from "./util";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 import { getAggregateFieldName } from "./field-names";
@@ -72,7 +72,10 @@ function buildExpression(expr, resolve) {
   } else if (expr.aggregate) {
     const identifier = getAggregateFieldName(expr);
     return (row, rowNum) => resolve(identifier, row, rowNum);
-  } else {
+  } else if (isArray(expr)) {
+    const memberExprs = expr.map(e => buildExpression(e, resolve));
+    return (row, rowNum) => memberExprs.map(memberExpr => memberExpr(row, rowNum));
+  }  else {
     throw new Error(`unexpected expression: ${JSON.stringify(expr)}`);
   }
 }

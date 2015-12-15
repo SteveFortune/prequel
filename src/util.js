@@ -27,6 +27,10 @@ export function isFunction(maybeFunction) {
   return typeof maybeFunction === "function";
 }
 
+export function isArray(maybeArray) {
+  return maybeArray instanceof Array;
+}
+
 export function mapObject(inputObject, func) {
   return Object.keys(inputObject).map(key => func(inputObject[key], key));
 }

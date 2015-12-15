@@ -191,3 +191,17 @@ test("BETWEEN", (t) => {
   t.false(between(1, 2, 3));
   t.end();
 });
+
+test("IN", (t) => {
+  const _in = operators["IN"];
+
+  t.true(_in(1, [1,2,3]));
+  t.false(_in(4, [1, 2, 3]));
+  t.true(_in("1", ["1", "2", "3"]));
+
+  // primitives only
+  t.false(_in([1], [[1]]));
+  t.false(_in({ a: 1 }, [{ a: 1 }]));
+
+  t.end();
+});

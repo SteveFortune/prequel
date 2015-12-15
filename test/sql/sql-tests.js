@@ -91,7 +91,8 @@ testQuery(`SELECT name FROM ${table} WHERE age > 20 AND isActive = 1`);
 testQuery(`SELECT name FROM ${table} WHERE NOT age > 20 AND isActive = 1 OR (name LIKE "%a%" AND NOT name LIKE "%e%")`);
 testQuery(`SELECT name FROM ${table} WHERE age BETWEEN 20 and 22`);
 testQuery(`SELECT name FROM ${table} WHERE NOT age BETWEEN 20 and 22`);
-
+testQuery(`SELECT name FROM ${table} WHERE age IN (30, 35, 40)`);
+testQuery(`SELECT name FROM ${table} WHERE age IN (22, id, "test")`);
 
 // Overall aggregation
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);

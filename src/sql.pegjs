@@ -133,6 +133,7 @@ and = "AND"i { return T() }
 or = "OR"i { return T() }
 not = "NOT"i { return T() }
 between = "BETWEEN"i { return T() }
+in = "IN"i { return T() }
 
 // Expressions use unrolled recursion
 // HT http://stackoverflow.com/a/30798758/2806996
@@ -151,6 +152,7 @@ operator_expression
   / lhs:operand _ op:unary_operator { return { lhs, op } }
   / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
   / between:between_expression { return between }
+  / in_expr:in_expression { return in_expr }
   / reference:identifier { return { reference } }
 
 base_expression
@@ -162,6 +164,13 @@ operand
   / literal:literal { return { literal } }
   / identifier:identifier { return { identifier } }
 
+operand_list
+  = head:operand_delim tail:operand_list { return [head].concat(tail) }
+  / only:operand { return [only] }
+
+operand_delim
+  = operand:operand list_delim { return operand }
+
 // modelling the operand as lhs makes evaluation simpler
 // since it can be assumed that all operators have at least an LHS argument.
 not_expression
@@ -171,6 +180,9 @@ not_expression
 //  argument list would be clearer.
 between_expression
   = lhs:operand _ op:between _ rhs:operand _ and _ ths:operand { return { op, lhs, rhs, ths } }
+
+in_expression
+  = lhs:operand _ op:in _ lp rhs:operand_list rp { return { lhs, op, rhs } }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
