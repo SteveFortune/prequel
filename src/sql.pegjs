@@ -83,7 +83,7 @@ limit_parameters
 field_list
   = head:field_delim tail:field_list { return [head].concat(tail) }
   / only:field { return [only] }
-  / "*" { return [] }
+  / star { return [] }
 
 field_delim
   = field:field list_delim { return field }
@@ -108,11 +108,11 @@ identifier
 
 aggregated_field
   = special_aggregated_field
-  / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, source: name } }
+  / aggregate:aggregate_function lp name:identifier rp { return { aggregate, source: name } }
 
 special_aggregated_field
-  = count "(" distinct __ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
-  / aggregate:count lp name:"*" rp { return { aggregate, source: name } }
+  = count lp distinct __ name:identifier rp { return { aggregate: "COUNT_DISTINCT", source: name } }
+  / aggregate:count lp name:star rp { return { aggregate, source: name } }
 
 aggregate_function
   = avg / count / first / last / max / min / sum
@@ -150,7 +150,7 @@ and_expression
 operator_expression
   = not:not_expression { return not }
   / lhs:operand __ op:unary_operator { return { lhs, op } }
-  / lhs:operand __ op:binary_operator __ rhs:operand { return { lhs, op, rhs } }
+  / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
   / reference:identifier { return { reference } }
@@ -215,7 +215,7 @@ source
   = identifier
 
 list_delim
-  = ", "
+  = "," _
 
 int = digits:[0-9]+ { return parseInt(digits.join("")) }
 
@@ -226,8 +226,12 @@ string
 sq = "'"
 dq = '"'
 
-lp = "(" { return "(" }
-rp = ")" { return ")"}
+lp = "(" _ { return "(" }
+rp = _ ")" { return ")"}
 
-__
-  = [ \t\r\n]+
+
+// mandatory whitespace
+__ = [ \t\r\n]+
+
+// optional whitespace
+_ = [ \t\r\n]*

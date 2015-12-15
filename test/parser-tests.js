@@ -245,12 +245,27 @@ test("HAVING COUNT(x) > 10", t => {
   t.end();
 });
 
-test("Mandatory whitespace can be any number of spaces, tabs, carriage returns and newlines", t => {
+// Most whitespace is mandatory
+test("Mandatory whitespace", t => {
   const q1 = "SELECT * FROM x WHERE y = z AND y IN (1, 2, 3)";
   const q2 = `SELECT
     *   FROM  x   WHERE
      y = z
       AND    y    in    (1, 2, 3)`;
+
+  const out1 = parseInsensitive(t, q1);
+  const out2 = parseInsensitive(t, q2);
+  t.deepEqual(out1, out2);
+  t.end();
+});
+
+// List delimiters, parentheses and most binary operators have optional whitespace
+test("Optional whitespace", t => {
+  const q1 = "SELECT a FROM x WHERE (y = z AND x < 2) OR (z > 3  AND y IN (1, 2))";
+  const q2 = `SELECT a FROM x WHERE (y=z AND x
+         <   2    ) OR (      z  >3 AND y IN (     1,2
+         )
+       )`;
 
   const out1 = parseInsensitive(t, q1);
   const out2 = parseInsensitive(t, q2);
