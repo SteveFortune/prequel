@@ -1,5 +1,5 @@
 import test from "tape";
-import parse from "../src/parser";
+import parse, { SyntaxError } from "../src/parser";
 
 // Test that `upperCaseQuery` parses the same in upper and lower case
 //  and returns the parse result.
@@ -270,5 +270,23 @@ test("Optional whitespace", t => {
   const out1 = parseInsensitive(t, q1);
   const out2 = parseInsensitive(t, q2);
   t.deepEqual(out1, out2);
+  t.end();
+});
+
+test("Parsing an invalid query throws SyntaxError", t => {
+  const badQuery = "SELECT * FROM )";
+  try {
+    parse(badQuery);
+    t.fail();
+  } catch (e) {
+    // Testing some of the pegjs SyntaxError properties
+    //  that the prequel error reporter will depend on
+    t.true(e instanceof SyntaxError);
+    t.equal(e.found, ")");
+    t.ok(e.expected);
+    t.equal(e.location.start.offset, 14);
+    t.equal(e.location.end.offset, 15);
+  }
+
   t.end();
 });
