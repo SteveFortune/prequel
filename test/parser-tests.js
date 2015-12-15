@@ -244,3 +244,16 @@ test("HAVING COUNT(x) > 10", t => {
   t.deepEqual(out.having, { lhs: { source: "x", aggregate: "COUNT" }, op: ">", rhs: { literal: 10 } });
   t.end();
 });
+
+test("Mandatory whitespace can be any number of spaces, tabs, carriage returns and newlines", t => {
+  const q1 = "SELECT * FROM x WHERE y = z AND y IN (1, 2, 3)";
+  const q2 = `SELECT
+    *   FROM  x   WHERE
+     y = z
+      AND    y    in    (1, 2, 3)`;
+
+  const out1 = parseInsensitive(t, q1);
+  const out2 = parseInsensitive(t, q2);
+  t.deepEqual(out1, out2);
+  t.end();
+});

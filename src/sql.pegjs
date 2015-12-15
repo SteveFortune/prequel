@@ -29,25 +29,25 @@ query
   }
 
 select_clause
-  = select _ fields:field_list _ from _ source:source { return { fields, source } }
+  = select __ fields:field_list __ from __ source:source { return { fields, source } }
 
 where_clause
-  = _ where _ condition:where_condition { return condition }
+  = __ where __ condition:where_condition { return condition }
 
 where_condition
   = expression
 
 group_clause
-  = _ group_by _ fields:identifier_list { return { fields } }
+  = __ group_by __ fields:identifier_list { return { fields } }
 
 having_clause
-  = _ having _ condition:having_condition { return condition }
+  = __ having __ condition:having_condition { return condition }
 
 having_condition
   = expression
 
 order_clause
-  = _ order_by _ order:order_tuple_list { return order }
+  = __ order_by __ order:order_tuple_list { return order }
 
 order_tuple_list
   = head:order_tuple_delim tail:order_tuple_list { return [head].concat(tail) }
@@ -57,13 +57,13 @@ order_tuple_delim
   = tuple:order_tuple list_delim { return tuple }
 
 order_tuple
-  = field:identifier _ order:order_dir { return { field, order } }
+  = field:identifier __ order:order_dir { return { field, order } }
   / field:identifier { return { field } }
 
 order_dir = asc / desc
 
 limit_clause
-  = _ limit _ limit:limit_parameters { return limit }
+  = __ limit __ limit:limit_parameters { return limit }
 
 select = "SELECT"i
 from = "FROM"i
@@ -89,7 +89,7 @@ field_delim
   = field:field list_delim { return field }
 
 field
-  = expr:field_expression _ as _ as:identifier { expr.as = as; return expr }
+  = expr:field_expression __ as __ as:identifier { expr.as = as; return expr }
   / expr:field_expression { return expr }
 
 field_expression
@@ -111,7 +111,7 @@ aggregated_field
   / aggregate:aggregate_function "(" name:identifier ")" { return { aggregate, source: name } }
 
 special_aggregated_field
-  = count "(" distinct _ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
+  = count "(" distinct __ name:identifier ")" { return { aggregate: "COUNT_DISTINCT", source: name } }
   / aggregate:count lp name:"*" rp { return { aggregate, source: name } }
 
 aggregate_function
@@ -142,15 +142,15 @@ expression
   = or_expression
 
 or_expression
-  = first:and_expression rest:(_ op:or_operator _ rhs:and_expression { return { op, rhs }  })* { return reduce(first, rest) }
+  = first:and_expression rest:(__ op:or_operator __ rhs:and_expression { return { op, rhs }  })* { return reduce(first, rest) }
 
 and_expression
-  = first:base_expression rest:(_ op:and_operator _ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
+  = first:base_expression rest:(__ op:and_operator __ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
 
 operator_expression
   = not:not_expression { return not }
-  / lhs:operand _ op:unary_operator { return { lhs, op } }
-  / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
+  / lhs:operand __ op:unary_operator { return { lhs, op } }
+  / lhs:operand __ op:binary_operator __ rhs:operand { return { lhs, op, rhs } }
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
   / reference:identifier { return { reference } }
@@ -174,15 +174,15 @@ operand_delim
 // modelling the operand as lhs makes evaluation simpler
 // since it can be assumed that all operators have at least an LHS argument.
 not_expression
-  = op:not_operator _ lhs:base_expression { return { op, lhs } }
+  = op:not_operator __ lhs:base_expression { return { op, lhs } }
 
 // use "ths" for "third-hand-side" operand of ternary operator. Perhaps an ordered
 //  argument list would be clearer.
 between_expression
-  = lhs:operand _ op:between _ rhs:operand _ and _ ths:operand { return { op, lhs, rhs, ths } }
+  = lhs:operand __ op:between __ rhs:operand __ and __ ths:operand { return { op, lhs, rhs, ths } }
 
 in_expression
-  = lhs:operand _ op:in _ lp rhs:operand_list rp { return { lhs, op, rhs } }
+  = lhs:operand __ op:in __ lp rhs:operand_list rp { return { lhs, op, rhs } }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
@@ -229,5 +229,5 @@ dq = '"'
 lp = "(" { return "(" }
 rp = ")" { return ")"}
 
-_
-  = [ ]+
+__
+  = [ \t\r\n]+
