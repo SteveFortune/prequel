@@ -58,3 +58,10 @@ test("prequel`SELECT name FROM ${testData} WHERE name ~ ${/[mn] [gd]/i}`", (t) =
   t.deepEqual(["Ellen Gould", "Chapman Gibbs", "Hoffman Grant"], result.map(r => r.name));
   t.end();
 });
+
+// SQL does not allow missing SELECT fields
+test("prequel`SELECT not, there FROM ${testData}`", (t) => {
+  const result = prequel`SELECT not, there FROM ${testData} LIMIT 1`;
+  t.deepEqual([{ not: undefined, there: undefined }], result);
+  t.end();
+});

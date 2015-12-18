@@ -4,7 +4,8 @@ import enrich from "../src/enrich";
 const fields = [
   { "name": "a" },
   { "name": "b", "as": "a" },
-  { "name": "c", "as": "d" }
+  { "name": "c", "as": "d" },
+  { "name": "x", "as": "y" },
 ];
 
 const data = {
@@ -24,5 +25,25 @@ test("resolve precendence", (t) => {
   t.equal(resolve("c", row), "C");
   t.equal(resolve("d", row), "C");
   t.equal(resolve("e", row), "datum e");
+  t.end();
+});
+
+test("when a field is missing, look for it in data", (t) => {
+  const { resolve } = enrich({ fields }, data);
+  const row = { };
+
+  t.equal(resolve("a", row), "datum a");
+  t.end();
+});
+
+test("missing values resolve to undefined", (t) => {
+  const data = {};
+  const row = {};
+  const { resolve } = enrich({ fields }, data);
+
+  t.equal(resolve("a", row), undefined);
+  t.equal(resolve("b", row), undefined);
+  t.equal(resolve("x", row), undefined);
+  t.equal(resolve("y", row), undefined);
   t.end();
 });

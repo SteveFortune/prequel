@@ -62,7 +62,10 @@ export default function enrich(query, data) {
 
     // Field with alias `identifier`
     if(exists(aliases[identifier])) {
-      return row[aliases[identifier].name];
+      const name = aliases[identifier].name;
+      if (exists(row[name])) {
+        return row[name];
+      }
     }
 
     // Referenced datum with key `identifier`
