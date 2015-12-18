@@ -73,7 +73,7 @@ test("WHERE referenced falsy value", (t) => {
   const input = [{ a: 1 }, { a: 3 }];
   const otherData = { $2: null };
 
-  const condition = { reference: "$2" };
+  const condition = { identifier: "$2" };
   const q = { where: condition, fields: [], source: "$1" };
 
   const result = testQuery(t, q, input, otherData);
@@ -85,7 +85,7 @@ test("WHERE referenced truthy value", (t) => {
   const input = [{ a: 1 }, { a: 3 }];
   const otherData = { $2: 1 };
 
-  const condition = { reference: "$2" };
+  const condition = { identifier: "$2" };
   const q = { where: condition, fields: [], source: "$1" };
 
   const result = testQuery(t, q, input, otherData);
@@ -103,7 +103,7 @@ test("WHERE referenced function is called with each row and row number", (t) => 
 
   const data = { $1: [1, 2, 3, 4, 5, 6].map(a => ({ a })), $2: predicate };
 
-  const condition = { reference: "$2" };
+  const condition = { identifier: "$2" };
   const q = { where: condition, fields: [], source: "$1" };
 
   // Only test array input, since other tests check that WHERE works

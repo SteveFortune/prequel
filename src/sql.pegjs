@@ -153,7 +153,7 @@ operator_expression
   / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
-  / reference:identifier { return { reference } }
+  / identifier:identifier { return { identifier } }
 
 base_expression
   = operator_expression

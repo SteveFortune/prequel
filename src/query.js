@@ -67,8 +67,6 @@ function buildExpression(expr, resolve) {
     return (row, rowNum) => resolve(expr.identifier, row, rowNum);
   } else if(expr.literal) {
     return () => expr.literal;
-  } else if (expr.reference) {
-    return (row, rowNum) => resolve(expr.reference, row, rowNum);
   } else if (expr.aggregate) {
     const identifier = getAggregateFieldName(expr);
     return (row, rowNum) => resolve(identifier, row, rowNum);

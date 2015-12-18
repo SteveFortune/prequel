@@ -159,7 +159,7 @@ test("Parentheses have higher precendence than AND", (t) => {
 
 test("WHERE reference", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE $ref");
-  t.deepEqual(out.where, { reference: "$ref"});
+  t.deepEqual(out.where, { identifier: "$ref"});
   t.end();
 });
 
