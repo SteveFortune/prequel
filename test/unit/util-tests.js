@@ -1,5 +1,5 @@
 import test from "tape";
-import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists } from "../src/util";
+import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists } from "../../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];

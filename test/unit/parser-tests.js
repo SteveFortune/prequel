@@ -1,5 +1,5 @@
 import test from "tape";
-import parse, { SyntaxError } from "../src/parser";
+import parse, { SyntaxError } from "../../src/parser";
 
 // Test that `upperCaseQuery` parses the same in upper and lower case
 //  and returns the parse result.

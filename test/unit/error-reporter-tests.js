@@ -1,6 +1,6 @@
 import test from "tape";
-import parser from "../build/parser.js";
-import { getSyntaxErrorMessage } from "../src/error-reporter";
+import parser from "../../build/parser.js";
+import { getSyntaxErrorMessage } from "../../src/error-reporter";
 
 // Test errors by generating a pegjs SyntaxError
 function testError(t, query, testFn) {

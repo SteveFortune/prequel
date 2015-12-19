@@ -1,5 +1,5 @@
 import test from "tape";
-import enrich from "../src/enrich";
+import enrich from "../../src/enrich";
 
 const fields = [
   { "name": "a" },

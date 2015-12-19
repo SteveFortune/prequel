@@ -1,6 +1,6 @@
 /* eslint camelcase:[0] */
 import test from "tape";
-import query from "../src/query";
+import query from "../../src/query";
 
 function* wrap(inputArray) {
   for(const value of inputArray) {

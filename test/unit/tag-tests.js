@@ -1,5 +1,5 @@
 import test from "tape";
-import q from "../src/tag";
+import q from "../../src/tag";
 
 test("Tagged template uses data from interpolated values", (t) => {
   const rows = [

@@ -1,6 +1,6 @@
 /* eslint dot-notation: [0] */
 import test from "tape";
-import operators from "../src/operators";
+import operators from "../../src/operators";
 
 test("=", (t) => {
   const eq = operators["="];

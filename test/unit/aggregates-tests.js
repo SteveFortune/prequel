@@ -1,5 +1,5 @@
 import test from "tape";
-import lookup, * as aggs from "../src/aggregates";
+import lookup, * as aggs from "../../src/aggregates";
 
 test("Count", (t) => {
   t.equal(aggs.count([1, 2, 3]), 3);

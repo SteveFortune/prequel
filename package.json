@@ -6,7 +6,9 @@
   "scripts": {
     "build-parser": "pegjs src/sql.pegjs build/parser.js",
     "pretest": "npm run build-parser",
-    "test": "nyc tape \"./test/**/*.js\" | faucet && nyc report --reporter text",
+    "test": "nyc tape \"./test/unit/**/*.js\" | faucet && nyc report --reporter text",
+    "preintegration-test": "npm run build-parser",
+    "integration-test": "babel-node $(which tape) \"./test/integration/**/*.js\" | faucet",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
     "clean": "rm -rf build/* coverage .nyc_output",
     "lint": "eslint **/*.js",
