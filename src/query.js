@@ -71,7 +71,7 @@ function buildExpression(expr, context, resolve) {
     return () => expr.literal;
   } else if (expr.aggregate) {
     if (context !== HAVING ) {
-      throw new Error(`Could not use aggregate function ${expr.aggregate} in ${context}. Did you mean HAVING?`)
+      throw new Error(`Could not use aggregate function ${expr.aggregate} in ${context}. Did you mean HAVING?`);
     }
     const identifier = getAggregateFieldName(expr);
     return (row, rowNum) => resolve(identifier, row, rowNum);
@@ -166,8 +166,12 @@ function getDefaultGroupValue(groupRows, fieldName, resolve) {
   return resolve(fieldName, groupRows[0], 0);
 }
 
-function having(input, { having: condition, resolve }) {
+function having(input, { group, having: condition, resolve }) {
   if(condition) {
+    if (!exists(group)) {
+      throw new Error("Cannot using HAVING without groups. Did you mean to GROUP BY some fields?");
+    }
+
     return filter(input, condition, HAVING, resolve);
   } else {
     return input;

@@ -87,3 +87,14 @@ test("prequel`SELECT name FROM ${testData} WHERE isActive AND COUNT(DISTINCT age
   }
   t.end();
 });
+
+// HAVING without GROUP BY
+test("prequel`SELECT name FROM ${testData} HAVING name = 'Sven'`", (t) => {
+  try {
+    const t = prequel`SELECT name FROM ${testData} HAVING name = 'Sven'`;
+    t.fail();
+  } catch(e) {
+    t.true(e.message.match(/Cannot using HAVING without groups. Did you mean to GROUP BY some fields?/i));
+  }
+  t.end();
+});
