@@ -115,6 +115,19 @@ test("WHERE referenced function is called with each row and row number", (t) => 
   t.end();
 });
 
+test("WHERE aggregate throws an error", (t) => {
+  const data = { $1: {} };
+  const q = { fields: [], where: { aggregate: "MAX", source: "age" }, source: "$1" };
+
+  try {
+    query(q, data);
+    t.fail();
+  } catch (e) {
+    t.true(e.message.match(/could not use aggregate function/i));
+  }
+  t.end();
+});
+
 test("ORDER BY ascending", (t) => {
   const input = [{ a: 5 }, { a: 3 }, { a: 4 }];
   const q = { fields: [], source: "$1", order: [{ field: "a" }] };
@@ -261,10 +274,6 @@ test("SELECT * FROM x LIMIT 3", (t) => {
   t.end();
 });
 
-test.skip("SELECT not_there FROM x LIMIT 3", () => {
-  // TODO: should throw "missing field" - #23.
-});
-
 test("SELECT * FROM x LIMIT 0", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
@@ -283,5 +292,35 @@ test("SELECT * FROM x LIMIT 1, 3", (t) => {
 
   t.equal(3, result.length);
   t.equal(2, result[0].a);
+  t.end();
+});
+
+test("SELECT b FROM x GROUP BY b HAVING COUNT(a) > 2", (t) => {
+  const input = [1, 2, 3, 4, 5].map(a => ({ a, b: a % 2 }));
+
+  const fields = [{ name: "b" }];
+  const having = { lhs: { aggregate: "COUNT", source: "a" }, op: ">", rhs: { literal: 2 }};
+  const group = { fields: ["b"] };
+
+  const q = { fields, having, group, source: "$1" };
+  const result = testQuery(t, q, input);
+
+  t.deepEqual(result, [{ b: 1 }]);
+  t.end();
+});
+
+test("HAVING without GROUP BY throws an error", (t) => {
+  const fields = [{ name: "a" }];
+  const having = { lhs: { aggregate: "COUNT", source: "a" }, op: ">", rhs: { literal: 2 }};
+  const q = { fields, having, source: "$1" };
+
+  try {
+    const result = testQuery(t, q, []);
+    t.fail();
+  } catch (e) {
+    console.log(e.message);
+    t.true(e.message.match(/cannot use having without groups/i));
+  }
+
   t.end();
 });

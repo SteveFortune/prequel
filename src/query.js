@@ -169,7 +169,7 @@ function getDefaultGroupValue(groupRows, fieldName, resolve) {
 function having(input, { group, having: condition, resolve }) {
   if(condition) {
     if (!exists(group)) {
-      throw new Error("Cannot using HAVING without groups. Did you mean to GROUP BY some fields?");
+      throw new Error("Cannot use HAVING without groups. Did you mean to GROUP BY some fields?");
     }
 
     return filter(input, condition, HAVING, resolve);
