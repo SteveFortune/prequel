@@ -318,7 +318,6 @@ test("HAVING without GROUP BY throws an error", (t) => {
     const result = testQuery(t, q, []);
     t.fail();
   } catch (e) {
-    console.log(e.message);
     t.true(e.message.match(/cannot use having without groups/i));
   }
 
