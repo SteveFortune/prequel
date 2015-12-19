@@ -115,6 +115,18 @@ test("WHERE referenced function is called with each row and row number", (t) => 
   t.end();
 });
 
+test("SELECT a FROM x WHERE a IN [1, 2]", (t) => {
+  const input = [1, 2, 3, 4, 5].map(a => ({ a }));
+
+  const fields = [{ name: "a" }];
+  const where = { lhs: { identifier: "a" }, op: "IN", rhs: [{ literal: 1 }, { literal: 2 }] };
+  const q = { fields, where, source: "$1" };
+
+  const result = testQuery(t, q, input);
+  t.deepEqual(result, [{ a: 1 }, { a: 2 }]);
+  t.end();
+});
+
 test("WHERE aggregate throws an error", (t) => {
   const data = { $1: {} };
   const q = { fields: [], where: { aggregate: "MAX", source: "age" }, source: "$1" };
