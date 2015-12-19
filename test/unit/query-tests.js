@@ -335,3 +335,17 @@ test("HAVING without GROUP BY throws an error", (t) => {
 
   t.end();
 });
+
+test("Unexpected expression type throws an error", (t) => {
+  const where = { unknown: "wat" };
+  const q = { fields: [], where, source: "$1" };
+
+  try {
+    const result = testQuery(t, q, []);
+    t.fail();
+  } catch (e) {
+    t.true(e.message.match(/unexpected expression/i));
+  }
+
+  t.end();
+});
