@@ -71,6 +71,11 @@ function matchGroupsInAnyOrder(t, prequelResults, dbResults) {
   return matchGroups(t, prequelResults, dbResults, (results) => results.map(row => JSON.stringify(row)).sort());
 }
 
+// Assert that both sqlite and prequel throw an exception
+function bothThrow(t) {
+
+}
+
 
 // SELECT
 testQuery(`SELECT name FROM ${table}`);

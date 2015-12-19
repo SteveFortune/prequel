@@ -5,6 +5,8 @@ import { getAggregateFieldName } from "./field-names";
 import enrichQuery from "./enrich";
 
 const DEFAULT_SORT_ORDER = "asc";
+const WHERE = "WHERE";
+const HAVING = "HAVING";
 
 export default function executeQuery(parsedQuery, data) {
   const input = [...data[parsedQuery.source]];
@@ -45,21 +47,21 @@ function selectAll(target) {
 
 function where(input, { where: condition, resolve }) {
   if(condition) {
-    return filter(input, condition, resolve);
+    return filter(input, condition, WHERE, resolve);
   } else {
     return input;
   }
 }
 
-function filter(input, condition, resolve) {
-  const predicate = buildExpression(condition, resolve);
+function filter(input, condition, context, resolve) {
+  const predicate = buildExpression(condition, context, resolve);
   return input.filter(predicate);
 }
 
 // Return a function that evaluates an expression for the given input
-function buildExpression(expr, resolve) {
+function buildExpression(expr, context, resolve) {
   if(expr.op) {
-    const func = buildOperatorExpression(expr, resolve);
+    const func = buildOperatorExpression(expr, context, resolve);
     return (row, rowNum) => {
       return func(row, rowNum);
     };
@@ -68,24 +70,27 @@ function buildExpression(expr, resolve) {
   } else if(expr.literal) {
     return () => expr.literal;
   } else if (expr.aggregate) {
+    if (context !== HAVING ) {
+      throw new Error(`Could not use aggregate function ${expr.aggregate} in ${context}. Did you mean HAVING?`)
+    }
     const identifier = getAggregateFieldName(expr);
     return (row, rowNum) => resolve(identifier, row, rowNum);
   } else if (isArray(expr)) {
-    const memberExprs = expr.map(e => buildExpression(e, resolve));
+    const memberExprs = expr.map(e => buildExpression(e, context, resolve));
     return (row, rowNum) => memberExprs.map(memberExpr => memberExpr(row, rowNum));
   }  else {
     throw new Error(`unexpected expression: ${JSON.stringify(expr)}`);
   }
 }
 
-function buildOperatorExpression(expr, resolve) {
+function buildOperatorExpression(expr, context, resolve) {
   const evaluateOperator = getOperator(expr.op);
   const childNames = ["lhs", "rhs", "ths"];
 
   // ths: "third hand side" for ternary operators
   const children = childNames
     .map(arg => {
-      if (exists(expr[arg])) return buildExpression(expr[arg], resolve);
+      if (exists(expr[arg])) return buildExpression(expr[arg], context, resolve);
     });
 
   return (row, rowNum) => {
@@ -163,7 +168,7 @@ function getDefaultGroupValue(groupRows, fieldName, resolve) {
 
 function having(input, { having: condition, resolve }) {
   if(condition) {
-    return filter(input, condition, resolve);
+    return filter(input, condition, HAVING, resolve);
   } else {
     return input;
   }

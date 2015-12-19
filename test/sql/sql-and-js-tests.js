@@ -65,3 +65,25 @@ test("prequel`SELECT not, there FROM ${testData}`", (t) => {
   t.deepEqual([{ not: undefined, there: undefined }], result);
   t.end();
 });
+
+// Error conditions
+// Aggregation function in WHERE
+test("prequel`SELECT name FROM ${testData} WHERE AVG(age) > 20`", (t) => {
+  try {
+    const t = prequel`SELECT name FROM ${testData} WHERE AVG(age) > 20`;
+    t.fail();
+  } catch(e) {
+    t.true(e.message.match(/Could not use aggregate function AVG in WHERE. Did you mean HAVING?/i));
+  }
+  t.end();
+});
+
+test("prequel`SELECT name FROM ${testData} WHERE isActive AND COUNT(DISTINCT age) > 20`", (t) => {
+  try {
+    const t = prequel`SELECT name FROM ${testData} WHERE isActive AND COUNT(DISTINCT age) > 20`;
+    t.fail();
+  } catch(e) {
+    t.true(e.message.match(/Could not use aggregate function COUNT_DISTINCT in WHERE. Did you mean HAVING?/i));
+  }
+  t.end();
+});
