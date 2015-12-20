@@ -2,7 +2,7 @@ import { groupBy, mapObject, pickKeys, sortByOrder, exists, isArray } from "./ut
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 import { getAggregateFieldName } from "./field-names";
-import enrichQuery from "./enrich";
+import compileQuery from "./compile";
 
 const DEFAULT_SORT_ORDER = "asc";
 const WHERE = "WHERE";
@@ -10,7 +10,7 @@ const HAVING = "HAVING";
 
 export default function executeQuery(parsedQuery, data) {
   const input = [...data[parsedQuery.source]];
-  const query = enrichQuery(parsedQuery, data);
+  const query = compileQuery(parsedQuery, data);
 
   const filtered = where(input, query);
   const aggregated = group(filtered, query);

@@ -1,5 +1,5 @@
 import test from "tape";
-import enrich from "../../src/enrich";
+import compile from "../../src/compile";
 
 const fields = [
   { "name": "a" },
@@ -17,7 +17,7 @@ const data = {
 };
 
 test("resolve precendence", (t) => {
-  const { resolve } = enrich({ fields }, data);
+  const { resolve } = compile({ fields }, data);
   const row = { a: "A", b: "B", c: "C" };
 
   t.equal(resolve("a", row), "A");
@@ -29,7 +29,7 @@ test("resolve precendence", (t) => {
 });
 
 test("when a field is missing, look for it in data", (t) => {
-  const { resolve } = enrich({ fields }, data);
+  const { resolve } = compile({ fields }, data);
   const row = { };
 
   t.equal(resolve("a", row), "datum a");
@@ -39,7 +39,7 @@ test("when a field is missing, look for it in data", (t) => {
 test("missing values resolve to undefined", (t) => {
   const data = {};
   const row = {};
-  const { resolve } = enrich({ fields }, data);
+  const { resolve } = compile({ fields }, data);
 
   t.equal(resolve("a", row), undefined);
   t.equal(resolve("b", row), undefined);
