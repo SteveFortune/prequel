@@ -109,6 +109,7 @@ testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroups });
 testQuery(`SELECT COUNT(DISTINCT age) AS uniq_age FROM ${table}`);
 testQuery(`SELECT AVG(age) FROM ${table}`, { test: matchGroups });
 testQuery(`SELECT MAX(age), * FROM ${table}`, { test: matchGroups, skip: 1 }); // FIXME #55
+testQuery(`SELECT age, age AS a2, age AS a3, * FROM ${table}`, { skip: 1 }); // FIXME #55
 
 // ORDER BY
 testQuery(`SELECT name, age FROM ${table} ORDER BY age`);
