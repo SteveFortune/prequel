@@ -45,6 +45,13 @@ test("prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}
   t.end();
 });
 
+// FIXME #54
+test.skip("prequel`SELECT AVG(${(row) => row.age + 4}) AS avg_skewed_age FROM ${table}`", (t) => {
+  const result = prequel`SELECT AVG(${(row) => row.age + 4}) AS avg_skewed_age FROM ${testData}`;
+  t.deepEqual({ avg_skewed_age: 33.1 });
+  t.end();
+});
+
 // sqlite does not support REGEXP et al
 test("prequel`SELECT name FROM ${testData} WHERE name REGEXP 'i'`", (t) => {
   const result = prequel`SELECT name FROM ${testData} WHERE name REGEXP '[ou]ff'`;

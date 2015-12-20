@@ -14,7 +14,9 @@ import createDb, { testData } from "./test-harness";
 const table = "test";
 const db = createDb(table);
 
-function testQuery(sql, { test=deepEqual, log=false, only=false } = {}) {
+function testQuery(sql, { test=deepEqual, log=false, only=false, skip=false } = {}) {
+  if (skip) return;
+
   const tapeFunc = only ? tape.only : tape;
 
   tapeFunc(sql, function(t) {
@@ -103,8 +105,10 @@ testQuery(`SELECT name FROM ${table} WHERE age IN (22, id, "test")`);
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);
 testQuery(`SELECT AVG(age) AS avg_age FROM ${table}`);
 // testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups}); // FIXME fails on default agg - sqlite seems to use LAST
-testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroupsInAnyOrder });
-
+testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroups });
+testQuery(`SELECT COUNT(DISTINCT age) AS uniq_age FROM ${table}`);
+testQuery(`SELECT AVG(age) FROM ${table}`, { test: matchGroups });
+testQuery(`SELECT MAX(age), * FROM ${table}`, { test: matchGroups, skip: 1 }); // FIXME #55
 
 // ORDER BY
 testQuery(`SELECT name, age FROM ${table} ORDER BY age`);
