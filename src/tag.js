@@ -1,5 +1,5 @@
 import parse from "./parser";
-import exec from "./query";
+import execute from "./execute";
 
 export default function oql(chunks, ...values) {
   const dataMap = {};
@@ -13,7 +13,7 @@ export default function oql(chunks, ...values) {
   }).join("");
 
   const parsed = parse(query);
-  return exec(parsed, dataMap);
+  return execute(parsed, dataMap);
 }
 
 let nextId = 0;

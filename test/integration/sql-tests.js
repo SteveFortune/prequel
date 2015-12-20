@@ -1,7 +1,7 @@
 import tape from "tape";
 import _ from "lodash";
 
-import prequelQuery from "../../src/query";
+import execute from "../../src/execute";
 import prequelParse from "../../src/parser";
 import createDb, { testData } from "./test-harness";
 
@@ -18,7 +18,7 @@ function testQuery(sql, { test=deepEqual, log=false, only=false } = {}) {
     }
 
     const parsed = prequelParse(sql);
-    const prequelResult = prequelQuery(parsed, { [table]: testData });
+    const prequelResult = execute(parsed, { [table]: testData });
 
     test(t, prequelResult, dbResult);
   });

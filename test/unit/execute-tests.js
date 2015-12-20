@@ -1,6 +1,6 @@
 /* eslint camelcase:[0] */
 import test from "tape";
-import query from "../../src/query";
+import execute from "../../src/execute";
 
 function* wrap(inputArray) {
   for(const value of inputArray) {
@@ -12,8 +12,8 @@ function* wrap(inputArray) {
 //  input produce identical output
 // Uses key $1 for data.
 function testQuery(t, q, inputArray, otherData={}) {
-  const arrayResult = query(q, Object.assign({ $1: inputArray }, otherData));
-  const iterableResult = query(q, Object.assign({ $1: wrap(inputArray) }, otherData));
+  const arrayResult = execute(q, Object.assign({ $1: inputArray }, otherData));
+  const iterableResult = execute(q, Object.assign({ $1: wrap(inputArray) }, otherData));
   t.deepEqual(arrayResult, iterableResult);
 
   return arrayResult;
@@ -108,7 +108,7 @@ test("WHERE referenced function is called with each row and row number", (t) => 
 
   // Only test array input, since other tests check that WHERE works
   //  with arrays and iterables
-  const result = query(q, data);
+  const result = execute(q, data);
   t.deepEqual([1, 3, 5], result.map(r => r.a));
   t.deepEqual([0, 1, 2, 3, 4, 5], seenRows);
 
@@ -132,7 +132,7 @@ test("WHERE aggregate throws an error", (t) => {
   const q = { fields: [], where: { aggregate: "MAX", source: "age" }, source: "$1" };
 
   try {
-    query(q, data);
+    execute(q, data);
     t.fail();
   } catch (e) {
     t.true(e.message.match(/could not use aggregate function/i));
