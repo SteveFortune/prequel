@@ -23,7 +23,6 @@
   // Return an obect describing an operation call
   //  with left-, right-, and "third"-hand arguments
   var OP = function(op, lhs, rhs, ths) {
-    console.log(op, lhs, rhs, ths);
     var result = { op: op }
     if (lhs != null) result.lhs = lhs;
     if (rhs != null) result.rhs = rhs;
