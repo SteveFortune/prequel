@@ -1,3 +1,9 @@
+//
+// PegJS SQL (subset) grammar
+// ES5 only because the built JS parser is called with `eval` and
+//  is not transpiled (#53)
+//
+
 {
   // Roll up unrolled "recursive" rules for left-associative expressions
   // HT http://stackoverflow.com/a/30798758/2806996
@@ -5,13 +11,25 @@
     if(!rest) return first;
 
     return rest.reduce(function(lhs, curr) {
-      return { op: curr.op, lhs, rhs: curr.rhs }
+      return { op: curr.op, lhs: lhs, rhs: curr.rhs }
     }, first);
   }
 
   // Return the text of the matched rule in upper case
   var T = function() {
     return text().toUpperCase();
+  }
+
+  // Return an obect describing an operation call
+  //  with left-, right-, and "third"-hand arguments
+  var OP = function(op, lhs, rhs, ths) {
+    console.log(op, lhs, rhs, ths);
+    var result = { op: op }
+    if (lhs != null) result.lhs = lhs;
+    if (rhs != null) result.rhs = rhs;
+    if (ths != null) result.ths = ths;
+
+    return result;
   }
 }
 
@@ -29,7 +47,7 @@ query
   }
 
 select_clause
-  = select __ fields:field_list __ from __ source:source { return { fields, source } }
+  = select __ fields:field_list __ from __ source:source { return { fields: fields, source: source } }
 
 where_clause
   = __ where __ condition:where_condition { return condition }
@@ -38,7 +56,7 @@ where_condition
   = expression
 
 group_clause
-  = __ group_by __ fields:identifier_list { return { fields } }
+  = __ group_by __ fields:identifier_list { return { fields: fields } }
 
 having_clause
   = __ having __ condition:having_condition { return condition }
@@ -57,8 +75,8 @@ order_tuple_delim
   = tuple:order_tuple list_delim { return tuple }
 
 order_tuple
-  = field:identifier __ order:order_dir { return { field, order } }
-  / field:identifier { return { field } }
+  = field:identifier __ order:order_dir { return { field: field, order: order } }
+  / field:identifier { return { field: field } }
 
 order_dir = asc / desc
 
@@ -94,7 +112,7 @@ field
 
 field_expression
   = agg:aggregated_field { return agg }
-  / name:identifier { return { name } }
+  / name:identifier { return { name: name } }
 
 identifier_list
   = head:identifier_delim tail:identifier_list { return [head].concat(tail) }
@@ -108,11 +126,11 @@ identifier
 
 aggregated_field
   = special_aggregated_field
-  / aggregate:aggregate_function lp name:identifier rp { return { aggregate, source: name } }
+  / aggregate:aggregate_function lp name:identifier rp { return { aggregate: aggregate, source: name } }
 
 special_aggregated_field
   = count lp distinct __ name:identifier rp { return { aggregate: "COUNT_DISTINCT", source: name } }
-  / aggregate:count lp name:star rp { return { aggregate, source: name } }
+  / aggregate:count lp name:star rp { return { aggregate: aggregate, source: name } }
 
 aggregate_function
   = avg / count / first / last / max / min / sum
@@ -142,18 +160,18 @@ expression
   = or_expression
 
 or_expression
-  = first:and_expression rest:(__ op:or_operator __ rhs:and_expression { return { op, rhs }  })* { return reduce(first, rest) }
+  = first:and_expression rest:(__ op:or_operator __ rhs:and_expression { return OP(op, null, rhs) })* { return reduce(first, rest) }
 
 and_expression
-  = first:base_expression rest:(__ op:and_operator __ rhs:base_expression { return { op, rhs } })* { return reduce(first, rest) }
+  = first:base_expression rest:(__ op:and_operator __ rhs:base_expression { return OP(op, null, rhs) })* { return reduce(first, rest) }
 
 operator_expression
   = not:not_expression { return not }
-  / lhs:operand __ op:unary_operator { return { lhs, op } }
-  / lhs:operand _ op:binary_operator _ rhs:operand { return { lhs, op, rhs } }
+  / lhs:operand __ op:unary_operator { return OP(op, lhs) }
+  / lhs:operand _ op:binary_operator _ rhs:operand { return OP(op, lhs, rhs) }
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
-  / identifier:identifier { return { identifier } }
+  / identifier:identifier { return { identifier: identifier } }
 
 base_expression
   = operator_expression
@@ -161,8 +179,8 @@ base_expression
 
 operand
   = agg:aggregated_field { return agg }
-  / literal:literal { return { literal } }
-  / identifier:identifier { return { identifier } }
+  / literal:literal { return { literal: literal } }
+  / identifier:identifier { return { identifier: identifier } }
 
 operand_list
   = head:operand_delim tail:operand_list { return [head].concat(tail) }
@@ -174,15 +192,15 @@ operand_delim
 // modelling the operand as lhs makes evaluation simpler
 // since it can be assumed that all operators have at least an LHS argument.
 not_expression
-  = op:not_operator __ lhs:base_expression { return { op, lhs } }
+  = op:not_operator __ lhs:base_expression { return OP(op, lhs) }
 
 // use "ths" for "third-hand-side" operand of ternary operator. Perhaps an ordered
 //  argument list would be clearer.
 between_expression
-  = lhs:operand __ op:between __ rhs:operand __ and __ ths:operand { return { op, lhs, rhs, ths } }
+  = lhs:operand __ op:between __ rhs:operand __ and __ ths:operand { return OP(op, lhs, rhs, ths) }
 
 in_expression
-  = lhs:operand __ op:in __ lp rhs:operand_list rp { return { lhs, op, rhs } }
+  = lhs:operand __ op:in __ lp rhs:operand_list rp { return OP(op, lhs, rhs) }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
