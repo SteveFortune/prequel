@@ -1,6 +1,6 @@
 /* eslint camelcase:[0] */
 import test from "tape";
-import prequel from "../../";
+import prequel from "../../src";
 import { testData } from "./test-harness";
 
 // End-to-end tests for prequel features that cannot be tested directly against sqlite.

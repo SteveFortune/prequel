@@ -1,7 +1,10 @@
 import parse from "./parser";
 import execute from "./execute";
 
-export default function oql(chunks, ...values) {
+//
+// Main API entry point. Expose a tagged template function.
+//
+export default function prequel(chunks, ...values) {
   const dataMap = {};
 
   const query = chunks.map((chunk, i) => {

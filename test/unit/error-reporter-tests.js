@@ -1,5 +1,5 @@
 import test from "tape";
-import parser from "../../build/parser.js";
+import parser from "../../dist/pegjs-parser";
 import { getSyntaxErrorMessage } from "../../src/error-reporter";
 
 // Test errors by generating a pegjs SyntaxError

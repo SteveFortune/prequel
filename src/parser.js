@@ -1,4 +1,4 @@
-import parser from "../build/parser";
+import parser from "../dist/pegjs-parser";
 import { getSyntaxErrorMessage } from "./error-reporter";
 
 export default function parse(query) {

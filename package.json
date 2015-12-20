@@ -1,18 +1,21 @@
 {
   "name": "prequel",
-  "version": "1.0.0-pre.0",
+  "version": "1.0.0-pre.4",
   "description": "Query JavaScript objects with SQL",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build-parser": "pegjs src/sql.pegjs build/parser.js",
+    "build-parser": "pegjs src/sql.pegjs dist/pegjs-parser.js",
     "pretest": "npm run build-parser",
-    "test": "nyc tape \"./test/unit/**/*.js\" | faucet && nyc report --reporter text",
-    "preintegration-test": "npm run build-parser",
+    "unit-test": "nyc tape \"./test/unit/**/*.js\" | faucet && nyc report --reporter text",
     "integration-test": "babel-node $(which tape) \"./test/integration/**/*.js\" | faucet",
+    "test": "npm run unit-test && npm run integration-test",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
-    "clean": "rm -rf build/* coverage .nyc_output",
+    "clean": "rm -rf dist/* coverage .nyc_output",
     "lint": "eslint **/*.js",
-    "node": "babel-node"
+    "node": "babel-node",
+    "prebuild": "npm run build-parser",
+    "build": "babel -d dist src",
+    "prepublish": "npm run build"
   },
   "browserify": {
     "transform": [
