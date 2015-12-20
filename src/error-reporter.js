@@ -1,4 +1,6 @@
 export function getSyntaxErrorMessage(syntaxError, query) {
+console.log(syntaxError);
+
   const headline = getHeadline(syntaxError, query);
   const snippet = getSnippet(syntaxError.location, query);
   const indicator = getIndicator(syntaxError.location, query);

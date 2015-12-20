@@ -8,6 +8,8 @@
     "pretest": "npm run build-parser",
     "unit-test": "nyc tape \"./test/unit/**/*.js\" | faucet && nyc report --reporter text",
     "integration-test": "babel-node $(which tape) \"./test/integration/**/*.js\" | faucet",
+    "preno-transpile-test": "npm run build",
+    "no-transpile-test": "tape \"test/no-transpile/**/*.js\" | faucet",
     "test": "npm run unit-test && npm run integration-test",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
     "clean": "rm -rf dist/* coverage .nyc_output",
