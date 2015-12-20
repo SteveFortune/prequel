@@ -122,7 +122,13 @@ identifier_delim
   = identifier:identifier list_delim { return identifier }
 
 identifier
-  = chars:[$_a-zA-Z0-9]+  { return chars.join("") }
+  = head:identifier_start tail:identifier_rest* { return head + tail.join("") }
+
+identifier_start
+  = char:[$_a-zA-Z] { return char }
+
+identifier_rest
+  = char:[$_a-zA-Z0-9] { return char }
 
 aggregated_field
   = special_aggregated_field
