@@ -5,6 +5,12 @@ import execute from "../../src/execute";
 import prequelParse from "../../src/parser";
 import createDb, { testData } from "./test-harness";
 
+//
+// Automatic SQL query tests
+// Run queries against prequel and an in-memory sqlite database. Verify that
+//  we get (approximately, according to test) the same result.
+//
+
 const table = "test";
 const db = createDb(table);
 
