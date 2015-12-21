@@ -45,10 +45,15 @@ test("prequel`SELECT id FROM ${prequel`SELECT * FROM ${testData} WHERE id > 25`}
   t.end();
 });
 
-// FIXME #54
-test.skip("prequel`SELECT AVG(${(row) => row.age + 4}) AS avg_skewed_age FROM ${table}`", (t) => {
+test("prequel`SELECT AVG(${(row) => row.age + 4}) AS avg_skewed_age FROM ${table}`", (t) => {
   const result = prequel`SELECT AVG(${(row) => row.age + 4}) AS avg_skewed_age FROM ${testData}`;
-  t.deepEqual({ avg_skewed_age: 33.1 });
+  t.deepEqual(result, [{ avg_skewed_age: 33.1 }]);
+  t.end();
+});
+
+test("SELECT MAX(age) FROM ${testData} GROUP BY ${row => row.fruit}", (t) => {
+  const result = prequel`SELECT fruit, MAX(age) FROM ${testData} GROUP BY ${row => row.fruit}`;
+  t.deepEqual(result, [{ fruit: "strawberry", max_age: 39 }, { fruit: "apple", max_age: 40 }, { fruit: "banana", max_age: 38 }]);
   t.end();
 });
 
