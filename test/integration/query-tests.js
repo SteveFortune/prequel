@@ -57,6 +57,32 @@ test("SELECT MAX(age) FROM ${testData} GROUP BY ${row => row.fruit}", (t) => {
   t.end();
 });
 
+test("SELECT age FROM ${testData} ORDER BY ${row => -1 * row.age} LIMIT 3", (t) => {
+  const result = prequel`SELECT age FROM ${testData} ORDER BY ${row => -1 * row.age} LIMIT 3`;
+  t.deepEqual(result.map(r => r.age), [40, 39, 38]);
+  t.end();
+});
+
+test("SELECT unread FROM ${testData} ORDER BY ${row => -1 * row.unread} DESC LIMIT 3", (t) => {
+  const result = prequel`SELECT unread FROM ${testData} ORDER BY ${row => -1 * row.unread} DESC LIMIT 3`;
+  t.deepEqual(result.map(r => r.unread), [1, 1, 3]);
+  t.end();
+});
+
+// FIXME #56 - limit data arguments
+test.skip("SELECT name FROM ${testData} LIMIT ${3}", (t) => {
+  const result = prequel`SELECT name FROM ${testData} LIMIT ${3}`;
+  t.deepEqual(result.map(r => r.name), ["Strickland Montoya", "Margie Duffy", "Thelma Johnston"]);
+  t.end();
+});
+
+// FIXME #56 - limit data arguments
+test.skip("SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}", (t) => {
+  const result = prequel`SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}`;
+  t.deepEqual(result.map(r => r.name), ["Margie Duffy", "Thelma Johnston"]);
+  t.end();
+});
+
 // sqlite does not support REGEXP et al
 test("prequel`SELECT name FROM ${testData} WHERE name REGEXP 'i'`", (t) => {
   const result = prequel`SELECT name FROM ${testData} WHERE name REGEXP '[ou]ff'`;

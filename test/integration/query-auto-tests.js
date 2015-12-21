@@ -16,7 +16,6 @@ const db = createDb(table);
 
 function testQuery(sql, { test=deepEqual, log=false, only=false, skip=false } = {}) {
   if (skip) return;
-
   const tapeFunc = only ? tape.only : tape;
 
   tapeFunc(sql, function(t) {
