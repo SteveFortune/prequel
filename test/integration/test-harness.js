@@ -53,7 +53,7 @@ export default function init(tableName) {
     testData,
     query(sql) {
       const stmt = db.prepare(sql);
-      let results = [];
+      const results = [];
       while(stmt.step()) {
         results.push(stmt.getAsObject());
       }

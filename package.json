@@ -13,7 +13,7 @@
     "test": "npm run unit-test && npm run integration-test",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
     "clean": "rm -rf dist/* coverage .nyc_output",
-    "lint": "eslint src/**/*.js",
+    "lint": "eslint src/**/*.js test/**/*.js",
     "node": "babel-node",
     "prebuild": "npm run build-parser",
     "build": "babel -d dist src",
