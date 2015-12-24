@@ -1,5 +1,5 @@
 import test from "tape";
-import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists } from "../../src/util";
+import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists, result } from "../../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];
@@ -99,5 +99,12 @@ test("exists", (t) => {
   t.true(exists(null));
   t.false(exists(undefined));
   t.false(exists());
+  t.end();
+});
+
+test("result", (t) => {
+  t.equal(result(1), 1);
+  t.equal(result(() => "hi"), "hi");
+  t.equal(result((x) => x), undefined);
   t.end();
 });

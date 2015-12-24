@@ -4,7 +4,9 @@ import getAggregateFunction from "./aggregates";
 import { getAggregateFieldName } from "./field-names";
 import compileQuery from "./compile";
 
-const DEFAULT_SORT_ORDER = "asc";
+const ASC = "asc";
+const DESC = "desc";
+const DEFAULT_SORT_ORDER = ASC;
 const WHERE = "WHERE";
 const HAVING = "HAVING";
 
@@ -193,16 +195,32 @@ function order(input, query) {
 }
 
 function getSortOrder(query, orderTuple) {
-  return orderTuple.order
-    ? resolveSortOrder(query, orderTuple.order)
-    : DEFAULT_SORT_ORDER;
+  const resolvedOrder = resolveSortOrder(query, orderTuple);
+  if (resolvedOrder) {
+    const normalizedOrder = resolvedOrder.toLowerCase();
+    if (isSortDirection(normalizedOrder)) {
+      return normalizedOrder;
+    } else {
+      throw new Error(`Unexpected sort order: ${resolvedOrder}`);
+    }
+  }
+
+  return DEFAULT_SORT_ORDER;
 }
 
-function resolveSortOrder(query, orderValue) {
-  if(exists(orderValue.literal)) {
-    return orderValue.literal.toLowerCase();
-  } else if (exists(orderValue.reference)) {
-    return query.resolveData(orderValue.reference);
+function isSortDirection(dir) {
+  return !dir || dir === ASC || dir === DESC;
+}
+
+function resolveSortOrder(query, orderTuple) {
+  const value = orderTuple.order;
+  if (!value) {
+    return DEFAULT_SORT_ORDER;
+  } else if(exists(value.literal)) {
+    return value.literal;
+  } else if (exists(value.reference)) {
+    const resolved =  query.resolveData(value.reference);
+    return result(resolved);
   } else {
     throw new Error(`Unexpected sort order: ${JSON.stringify(orderValue)}`);
   }

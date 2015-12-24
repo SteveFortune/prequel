@@ -75,6 +75,16 @@ test("SELECT age FROM ${testData} ORDER BY age ${() => 'DESC'} LIMIT 3", (t) => 
   t.end();
 });
 
+test("SELECT age FROM ${testData} ORDER BY age ${() => 'wat'}", (t) => {
+  try {
+    prequel`SELECT age FROM ${testData} ORDER BY age ${() => "wat"}`;
+    t.fail();
+  } catch (e) {
+    t.true(e.message.match(/unexpected sort order/i));
+  }
+  t.end();
+});
+
 test("SELECT unread FROM ${testData} ORDER BY ${row => -1 * row.unread} DESC LIMIT 3", (t) => {
   const result = prequel`SELECT unread FROM ${testData} ORDER BY ${row => -1 * row.unread} DESC LIMIT 3`;
   t.deepEqual(result.map(r => r.unread), [1, 1, 3]);

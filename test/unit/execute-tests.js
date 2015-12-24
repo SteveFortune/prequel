@@ -167,6 +167,19 @@ test("ORDER BY referenced literal", (t) => {
   t.end();
 });
 
+test("ORDER BY unexpected direction throws an error", (t) => {
+  const q = { fields: [], source: "$1", order: [{ field: "a", order: { reference: "$order" } }] };
+
+  try {
+    testQuery(t, q, [], { $order: "not an order" });
+    t.fail();
+  } catch (e) {
+    t.true(e.message.match(/unexpected sort order/i));
+  }
+
+  t.end();
+});
+
 test("ORDER BY referenced function", (t) => {
   const input = [{ a: 5 }, { a: 3 }, { a: 4 }];
   const q = { fields: [], source: "$1", order: [{ field: "a", order: { reference: "$order" } }] };
