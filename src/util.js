@@ -1,6 +1,3 @@
-import sortByOrder from "lodash.sortbyorder";
-export { sortByOrder };
-
 function reduceToObject(inputArray, getKey, getValue) {
   const keyFunc = isFunction(getKey) ? getKey : obj => obj[getKey];
 
@@ -58,4 +55,33 @@ export function result(expr) {
   return isFunction(expr)
     ? expr()
     : expr;
+}
+
+export function sortByOrder(input, orders) {
+  function comparator(a, b) {
+    for (const [field, dir] of orders) {
+      const compared = compareValues(a[field], b[field]);
+      if(compared !== 0) {
+        return (dir === "desc")
+          ? -1 * compared
+          : compared;
+      }
+    }
+
+    return 0;
+  }
+
+  return [...input].sort(comparator);
+}
+
+function compareValues (a, b) {
+  if (isFunction(a.localeCompare)) {
+    return a.localeCompare("" + b);
+  } else if (a < b) {
+    return -1;
+  } else if (a > b) {
+    return 1;
+  } else {
+    return 0;
+  }
 }

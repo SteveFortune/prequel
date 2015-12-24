@@ -1,5 +1,6 @@
 import test from "tape";
-import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists, result } from "../../src/util";
+import _ from "lodash";
+import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists, result, sortByOrder } from "../../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];
@@ -106,5 +107,30 @@ test("result", (t) => {
   t.equal(result(1), 1);
   t.equal(result(() => "hi"), "hi");
   t.equal(result((x) => x), undefined);
+  t.end();
+});
+
+// Test against lodash's implementation
+// (ignoring un-sorted columns)
+test.only("sortByOrder", (t) => {
+  const input = [];
+  for (let a = 0; a < 3; a ++) {
+    for (let b = 0; b < 3; b ++) {
+      for (let c = 0; c < 3; c ++) {
+        for (let d = 0; d < 3; d ++) {
+          input.push({ a, b, c, d });
+        }
+      }
+    }
+  }
+
+  const fields = ["a", "b", "c", "d"];
+  const orders = ["asc"];
+  const orderSpec = _.zip(fields, orders);
+
+  const result = sortByOrder(input, orderSpec);
+  const lodashResult = _.sortByOrder(input, fields, orders);
+  t.deepEqual(result, lodashResult);
+
   t.end();
 });
