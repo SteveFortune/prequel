@@ -58,6 +58,12 @@ export function result(expr) {
 }
 
 export function sortByOrder(input, orders) {
+  if (!orders || orders.length === 0) {
+    return input;
+  }
+  
+  const index = Symbol("index");
+
   function comparator(a, b) {
     for (const [field, dir] of orders) {
       const compared = compareValues(a[field], b[field]);
@@ -68,16 +74,26 @@ export function sortByOrder(input, orders) {
       }
     }
 
-    return 0;
+    return compareOrdinals(a[index], b[index]);
   }
 
-  return [...input].sort(comparator);
+  // Hack - add index to each input row to mimic stable [].sort
+  return input
+    // .map((row, i) => {
+    //   row[index] = i;
+    //   return row;
+    // })
+    .sort(comparator);
 }
 
 function compareValues (a, b) {
-  if (isFunction(a.localeCompare)) {
-    return a.localeCompare("" + b);
-  } else if (a < b) {
+  return (isFunction(a.localeCompare))
+    ? a.localeCompare(b)
+    : compareOrdinals(a, b);
+}
+
+function compareOrdinals(a, b) {
+  if (a < b) {
     return -1;
   } else if (a > b) {
     return 1;

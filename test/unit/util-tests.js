@@ -112,7 +112,7 @@ test("result", (t) => {
 
 // Test against lodash's implementation
 // (ignoring un-sorted columns)
-test.only("sortByOrder", (t) => {
+test("sortByOrder", (t) => {
   const input = [];
   for (let a = 0; a < 3; a ++) {
     for (let b = 0; b < 3; b ++) {
@@ -124,13 +124,19 @@ test.only("sortByOrder", (t) => {
     }
   }
 
-  const fields = ["a", "b", "c", "d"];
-  const orders = ["asc"];
-  const orderSpec = _.zip(fields, orders);
+  function testOrder(spec) {
+    const fields = _.pluck(spec, 0);
+    const orders = _.compact(_.pluck(spec, 1));
+    const result = sortByOrder(input, spec);
+    const controlResult = _.sortByOrder(input, spec);
+    t.deepEqual(result, controlResult);
+  }
 
-  const result = sortByOrder(input, orderSpec);
-  const lodashResult = _.sortByOrder(input, fields, orders);
-  t.deepEqual(result, lodashResult);
+  testOrder([["a"], ["b"], ["c"], ["d"]]);
+  testOrder([["a", "desc"], ["b"], ["c", "desc"], ["d"]]);
+  testOrder([["c", "desc"]]);
+  testOrder([["d"]]);
+  testOrder();
 
   t.end();
 });
