@@ -169,24 +169,30 @@ test("ORDER BY", (t) => {
   t.end();
 });
 
-test("ORDER BY explicit ASC", (t) => {
+test("ORDER BY literal ASC", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat ORDER BY f1 ASC");
-  t.deepEqual(out.order, [{ field: "f1", order: "ASC" }]);
+  t.deepEqual(out.order, [{ field: "f1", order: { literal: "ASC" } }]);
   t.end();
 });
 
-test("ORDER BY DESC", (t) => {
+test("ORDER BY literal DESC", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat ORDER BY f1 DESC");
-  t.deepEqual(out.order, [{ field: "f1", order: "DESC" }]);
+  t.deepEqual(out.order, [{ field: "f1", order: { literal: "DESC" } }]);
+  t.end();
+});
+
+test("ORDER BY reference", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat ORDER BY f1 $order");
+  t.deepEqual(out.order, [{ field: "f1", order: { reference: "$order" } }]);
   t.end();
 });
 
 test("ORDER BY several fields", (t) => {
-  const out = parseInsensitive(t, "SELECT f1 FROM wat ORDER BY f1 DESC, f2, f3 ASC");
+  const out = parseInsensitive(t, "SELECT f1 FROM wat ORDER BY f1 DESC, f2, f3 $order");
   t.deepEqual(out.order, [
-    { field: "f1", order: "DESC" },
+    { field: "f1", order: { literal: "DESC" } },
     { field: "f2" },
-    { field: "f3", order: "ASC" }
+    { field: "f3", order: { reference: "$order" } }
   ]);
   t.end();
 });

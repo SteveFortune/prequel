@@ -63,16 +63,14 @@ test("SELECT age FROM ${testData} ORDER BY ${row => -1 * row.age} LIMIT 3", (t) 
   t.end();
 });
 
-// FIXME #57 - order by string literal
-test.skip("SELECT age FROM ${testData} ORDER BY ${'age'} LIMIT 3", (t) => {
-  const result = prequel`SELECT age FROM ${testData} ORDER BY ${"age"} LIMIT 3`;
-  t.deepEqual(result.map(r => r.age), [21, 21, 22]);
+test("SELECT age FROM ${testData} ORDER BY age ${'DESC'} LIMIT 3", (t) => {
+  const result = prequel`SELECT age FROM ${testData} ORDER BY age ${"DESC"} LIMIT 3`;
+  t.deepEqual(result.map(r => r.age), [40, 39, 38]);
   t.end();
 });
 
-// FIXME #57 - order by string literal
-test.skip("SELECT age FROM ${testData} ORDER BY ${'age'} ${'DESC'} LIMIT 3", (t) => {
-  const result = prequel`SELECT age FROM ${testData} ORDER BY ${"age"} ${"DESC"} LIMIT 3`;
+test("SELECT age FROM ${testData} ORDER BY age ${() => 'DESC'} LIMIT 3", (t) => {
+  const result = prequel`SELECT age FROM ${testData} ORDER BY age ${() => "DESC"} LIMIT 3`;
   t.deepEqual(result.map(r => r.age), [40, 39, 38]);
   t.end();
 });

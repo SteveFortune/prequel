@@ -50,7 +50,7 @@ function getAggregations(query) {
   return mergeAggs(fieldAggs.concat(...havingAggs));
 }
 
-export default function enrich(query, data) {
+export default function compile(query, data) {
   const withAlias = query.fields.filter(f => f.as);
   const aliases = indexBy(withAlias, "as");
 
@@ -69,7 +69,7 @@ export default function enrich(query, data) {
     }
 
     // Referenced datum with key `identifier`
-    const datum = data[identifier];
+    const datum = resolveData(identifier);
     if(exists(datum)) {
       return isFunction(datum) ? datum(row, rowNumber) : datum;
     }
@@ -77,9 +77,14 @@ export default function enrich(query, data) {
     return undefined;
   }
 
+  function resolveData(key) {
+    return data[key];
+  }
+
   // TODO query should be a property
   return Object.assign(query, {
     resolve,
+    resolveData,
     aggregations: getAggregations(query),
     fields: getOutputFields(query)
   });

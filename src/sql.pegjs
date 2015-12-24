@@ -30,6 +30,15 @@
 
     return result;
   }
+
+  var reservedWords = [
+    "SELECT", "WHERE", "GROUP", "HAVING", "ORDER", "LIMIT"
+  ];
+
+  // Returns true if `s` is a reserved word
+  var RESERVED = function(s) {
+    return reservedWords.indexOf(s) >= 0;
+  }
 }
 
 start
@@ -77,7 +86,11 @@ order_tuple
   = field:identifier __ order:order_dir { return { field: field, order: order } }
   / field:identifier { return { field: field } }
 
-order_dir = asc / desc
+order_dir
+  = literal:literal_order_dir { return { literal: literal } }
+  / ref:identifier { return { reference: ref } }
+
+literal_order_dir = asc / desc
 
 limit_clause
   = __ limit __ limit:limit_parameters { return limit }
@@ -121,6 +134,9 @@ identifier_delim
   = identifier:identifier list_delim { return identifier }
 
 identifier
+  = chars:identifier_chars !{ return RESERVED(chars) } { return chars }
+
+identifier_chars
   = head:identifier_start tail:identifier_rest* { return head + tail.join("") }
 
 identifier_start

@@ -151,16 +151,34 @@ test("ORDER BY ascending", (t) => {
 
 test("ORDER BY descending", (t) => {
   const input = [{ a: 5 }, { a: 3 }, { a: 4 }];
-  const q = { fields: [], source: "$1", order: [{ field: "a", order: "DESC" }] };
+  const q = { fields: [], source: "$1", order: [{ field: "a", order: { literal: "DESC" } }] };
 
   const result = testQuery(t, q, input);
   t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
   t.end();
 });
 
+test("ORDER BY referenced literal", (t) => {
+  const input = [{ a: 5 }, { a: 3 }, { a: 4 }];
+  const q = { fields: [], source: "$1", order: [{ field: "a", order: { reference: "$order" } }] };
+
+  const result = testQuery(t, q, input, { $order: "DESC" });
+  t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
+  t.end();
+});
+
+test("ORDER BY referenced function", (t) => {
+  const input = [{ a: 5 }, { a: 3 }, { a: 4 }];
+  const q = { fields: [], source: "$1", order: [{ field: "a", order: { reference: "$order" } }] };
+
+  const result = testQuery(t, q, input, { $order: () => "DESC" });
+  t.deepEqual([{ a: 5 }, { a: 4 }, { a: 3 }], result);
+  t.end();
+});
+
 test("ORDER BY several fields", (t) => {
   const input = [{ a: 1, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 2 }];
-  const q = { fields: [], source: "$1", order: [{ field: "a", order: "DESC" }, { field: "b" }] };
+  const q = { fields: [], source: "$1", order: [{ field: "a", order: { literal: "DESC" } }, { field: "b" }] };
 
   const result = testQuery(t, q, input);
   t.deepEqual([2, 1, 2], result.map(r => r.b));

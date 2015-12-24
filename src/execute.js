@@ -178,12 +178,12 @@ function having(input, { group, having: condition, resolve }) {
   }
 }
 
-function order(input, { order: fieldOrders, resolve }) {
-  if(fieldOrders) {
-    const orders = fieldOrders.map(getSortOrder);
-    const getFields = fieldOrders
+function order(input, query) {
+  if(query.order) {
+    const orders = query.order.map(order => getSortOrder(query, order));
+    const getFields = query.order
       .map(order =>
-        row => resolve(order.field, row)
+        row => query.resolve(order.field, row)
       );
 
     return sortByOrder(input, getFields, orders);
@@ -192,10 +192,20 @@ function order(input, { order: fieldOrders, resolve }) {
   }
 }
 
-function getSortOrder(orderTuple) {
+function getSortOrder(query, orderTuple) {
   return orderTuple.order
-    ? orderTuple.order.toLowerCase()
+    ? resolveSortOrder(query, orderTuple.order)
     : DEFAULT_SORT_ORDER;
+}
+
+function resolveSortOrder(query, orderValue) {
+  if(orderValue.literal) {
+    return orderValue.literal.toLowerCase();
+  } else if (orderValue.reference) {
+    return query.resolveData(orderValue.reference);
+  } else {
+    throw new Error(`Unexpected sort order: ${JSON.stringify(orderValue)}`);
+  }
 }
 
 function limit(input, { limit: limitParams }) {
