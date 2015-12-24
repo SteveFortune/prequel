@@ -81,15 +81,13 @@ test("SELECT unread FROM ${testData} ORDER BY ${row => -1 * row.unread} DESC LIM
   t.end();
 });
 
-// FIXME #56 - limit data arguments
-test.skip("SELECT name FROM ${testData} LIMIT ${3}", (t) => {
+test("SELECT name FROM ${testData} LIMIT ${3}", (t) => {
   const result = prequel`SELECT name FROM ${testData} LIMIT ${3}`;
   t.deepEqual(result.map(r => r.name), ["Strickland Montoya", "Margie Duffy", "Thelma Johnston"]);
   t.end();
 });
 
-// FIXME #56 - limit data arguments
-test.skip("SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}", (t) => {
+test("SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}", (t) => {
   const result = prequel`SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}`;
   t.deepEqual(result.map(r => r.name), ["Margie Duffy", "Thelma Johnston"]);
   t.end();

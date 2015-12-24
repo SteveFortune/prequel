@@ -233,15 +233,27 @@ test("SELECT mixed fields and aggregate fields", t => {
   t.end();
 });
 
-test("LIMIT count", t => {
+test("LIMIT literal count", t => {
   const out = parseInsensitive(t, "SELECT * FROM x LIMIT 1");
-  t.deepEqual(out.limit, { count: 1 });
+  t.deepEqual(out.limit, { count: { literal: 1 } });
+  t.end();
+});
+
+test("LIMIT reference count", t => {
+  const out = parseInsensitive(t, "SELECT * FROM x LIMIT $1");
+  t.deepEqual(out.limit, { count: { reference: "$1" } });
   t.end();
 });
 
 test("LIMIT offset count", t => {
   const out = parseInsensitive(t, "SELECT * FROM x LIMIT 5, 10");
-  t.deepEqual(out.limit, { offset: 5, count: 10 });
+  t.deepEqual(out.limit, { offset: { literal: 5 }, count: { literal: 10 } });
+  t.end();
+});
+
+test("LIMIT offset with literal and reference", t => {
+  const out = parseInsensitive(t, "SELECT * FROM x LIMIT 5, $1");
+  t.deepEqual(out.limit, { offset: { literal: 5 }, count: { reference: "$1" } });
   t.end();
 });
 

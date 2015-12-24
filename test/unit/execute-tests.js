@@ -297,7 +297,7 @@ test("SELECT COUNT(*) FROM x", (t) => {
 test("SELECT * FROM x LIMIT 3", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
-  const q = { fields: [], limit: { count: 3 }, source: "$1" };
+  const q = { fields: [], limit: { count: { literal: 3 } }, source: "$1" };
   const result = testQuery(t, q, input);
 
   t.equal(3, result.length);
@@ -307,7 +307,7 @@ test("SELECT * FROM x LIMIT 3", (t) => {
 test("SELECT * FROM x LIMIT 0", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
-  const q = { fields: [], limit: { count: 0 }, source: "$1" };
+  const q = { fields: [], limit: { count: { literal: 0 } }, source: "$1" };
   const result = testQuery(t, q, input);
 
   t.equal(0, result.length);
@@ -317,11 +317,22 @@ test("SELECT * FROM x LIMIT 0", (t) => {
 test("SELECT * FROM x LIMIT 1, 3", (t) => {
   const input = [1, 2, 3, 4, 5].map(a => ({ a }));
 
-  const q = { fields: [], limit: { offset: 1, count: 3 }, source: "$1" };
+  const q = { fields: [], limit: { offset: { literal: 1 }, count: { literal: 3 } }, source: "$1" };
   const result = testQuery(t, q, input);
 
   t.equal(3, result.length);
   t.equal(2, result[0].a);
+  t.end();
+});
+
+test("SELECT * FROM x LIMIT $a, $b", (t) => {
+  const input = [1, 2, 3, 4, 5].map(a => ({ a }));
+
+  const q = { fields: [], limit: { offset: { reference: "$a" }, count: { reference: "$b" } }, source: "$1" };
+  const result = testQuery(t, q, input, { $a: 2, $b: 2 });
+
+  t.equal(2, result.length);
+  t.equal(3, result[0].a);
   t.end();
 });
 

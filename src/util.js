@@ -53,3 +53,9 @@ export function objectValues(inputObject) {
 export function exists(value) {
   return typeof value !== "undefined";
 }
+
+export function result(expr) {
+  return isFunction(expr)
+    ? expr()
+    : expr;
+}

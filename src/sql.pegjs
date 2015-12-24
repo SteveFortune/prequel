@@ -107,8 +107,12 @@ asc = "ASC"i { return T() }
 desc = "DESC"i { return T() }
 
 limit_parameters
-  = offset:int list_delim count:int { return { offset: +offset, count: +count } }
-  / count:int { return { count: +count } }
+  = offset:limit_parameter list_delim count:limit_parameter { return { offset: offset, count: count } }
+  / count:limit_parameter { return { count: count } }
+
+limit_parameter
+  = n:int { return { literal: n } }
+  / ref:identifier { return { reference: ref } }
 
 field_list
   = head:field_delim tail:field_list { return [head].concat(tail) }
@@ -256,7 +260,7 @@ source
 list_delim
   = "," _
 
-int = digits:[0-9]+ { return parseInt(digits.join("")) }
+int = digits:[0-9]+ { return parseInt(digits.join(""), 10) }
 
 string
   = sq chars:[^']* sq { return chars.join("") }

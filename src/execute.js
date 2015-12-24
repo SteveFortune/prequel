@@ -1,4 +1,4 @@
-import { groupBy, mapObject, pickKeys, sortByOrder, exists, isArray } from "./util";
+import { groupBy, mapObject, pickKeys, sortByOrder, exists, isArray, result } from "./util";
 import operators from "./operators";
 import getAggregateFunction from "./aggregates";
 import { getAggregateFieldName } from "./field-names";
@@ -199,21 +199,35 @@ function getSortOrder(query, orderTuple) {
 }
 
 function resolveSortOrder(query, orderValue) {
-  if(orderValue.literal) {
+  if(exists(orderValue.literal)) {
     return orderValue.literal.toLowerCase();
-  } else if (orderValue.reference) {
+  } else if (exists(orderValue.reference)) {
     return query.resolveData(orderValue.reference);
   } else {
     throw new Error(`Unexpected sort order: ${JSON.stringify(orderValue)}`);
   }
 }
 
-function limit(input, { limit: limitParams }) {
-  if(limitParams) {
-    const offset = limitParams.offset || 0;
+function limit(input, query) {
+  if(query.limit) {
+    const offset = resolveLimitParam(query, query.limit.offset);
+    const count = resolveLimitParam(query, query.limit.count);
 
-    return input.slice(offset, offset + limitParams.count);
+    return input.slice(offset, offset + count);
   } else {
     return input;
+  }
+}
+
+function resolveLimitParam(query, param) {
+  if(!param) {
+    return 0;
+  } else if(exists(param.literal)) {
+    return param.literal;
+  } else if (exists(param.reference)) {
+    const datum = query.resolveData(param.reference);
+    return result(datum);
+  } else {
+    throw new Error(`Unexpected limit parameter: [[${JSON.stringify(param.literal)}]]`);
   }
 }
