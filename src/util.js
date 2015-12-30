@@ -57,45 +57,48 @@ export function result(expr) {
     : expr;
 }
 
-export function sortByOrder(input, orders) {
-  if (!orders || orders.length === 0) {
+export function sortByOrder(input, spec) {
+  if (!spec || spec.length === 0) {
     return input;
   }
-  
-  const index = Symbol("index");
+
+  const directions = spec.map(([field, dir]) => dir === "desc" ? -1 : 1);
 
   function comparator(a, b) {
-    for (const [field, dir] of orders) {
-      const compared = compareValues(a[field], b[field]);
+    for (let i = 0; i < a.criteria.length; i ++) {
+      const compared = compareValues(a.criteria[i], b.criteria[i]);
       if(compared !== 0) {
-        return (dir === "desc")
-          ? -1 * compared
-          : compared;
+        return compared * directions[i];
       }
     }
 
-    return compareOrdinals(a[index], b[index]);
+    return a.index - b.index;
   }
 
-  // Hack - add index to each input row to mimic stable [].sort
+  function wrap(value, index) {
+    return {
+      index,
+      value,
+      criteria: spec.map(([field]) => value[field])
+    };
+  }
+
+
+  // Sort a wrapped form of in the input to make Array.sort stable
   return input
-    // .map((row, i) => {
-    //   row[index] = i;
-    //   return row;
-    // })
-    .sort(comparator);
+    .map(wrap)
+    .sort(comparator)
+    .map(unwrapForSort);
 }
 
-function compareValues (a, b) {
-  return (isFunction(a.localeCompare))
-    ? a.localeCompare(b)
-    : compareOrdinals(a, b);
+function unwrapForSort(wrappedValue) {
+  return wrappedValue.value;
 }
 
-function compareOrdinals(a, b) {
-  if (a < b) {
+function compareValues(a, b) {
+  if (a < b || !exists(a)) {
     return -1;
-  } else if (a > b) {
+  } else if (a > b || !exists(b)) {
     return 1;
   } else {
     return 0;
