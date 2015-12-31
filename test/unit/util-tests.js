@@ -124,23 +124,17 @@ test("sortByOrder", (t) => {
     }
   }
 
-  function testOrder(spec) {
-    // Translate the sort spec for lodash
-    // [[field, dir?]] => [fields], [dirs]
-    const fields = _.pluck(spec, 0);
-    const orders = _.pluck(spec, 1).map(f => f ? f : "asc");
-
-    const result = sortByOrder(input, spec);
+  function testOrder(fields, orders) {
+    const result = sortByOrder(input, fields, orders);
     const controlResult = _.sortByOrder(input, fields, orders);
 
     t.deepEqual(result, controlResult);
   }
 
-  testOrder([["a"], ["b"], ["c"], ["d"]]);
-  testOrder([["a", "desc"], ["b", "asc"], ["c", "desc"], ["d"]]);
-  testOrder([["c", "desc"]]);
-  testOrder([["d"]]);
-  testOrder();
+  testOrder(["a", "b", "c", "d"], ["asc", "asc", "asc", "asc"]);
+  testOrder(["a", "b", "c", "d"], ["desc", "asc", "desc", "asc"]);
+  testOrder(["c"], ["desc"]);
+  testOrder(["d"], ["asc"]);
 
   t.end();
 });

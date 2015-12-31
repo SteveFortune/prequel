@@ -57,29 +57,29 @@ export function result(expr) {
     : expr;
 }
 
-export function sortByOrder(input, spec) {
-  if (!spec || spec.length === 0) {
+export function sortByOrder(input, fields = [], orders = []) {
+  if (fields.length === 0) {
     return input;
   }
 
-  const directions = spec.map(([field, dir]) => dir === "desc" ? -1 : 1);
+  const orderMultipliers = orders.map(getSortMultiplier);
 
   function comparator(a, b) {
     for (let i = 0; i < a.criteria.length; i ++) {
       const compared = compareValues(a.criteria[i], b.criteria[i]);
       if(compared !== 0) {
-        return compared * directions[i];
+        return compared * orderMultipliers[i];
       }
     }
 
-    return a.index - b.index;
+    return compareValues(a.index, b.index);
   }
 
   function wrap(value, index) {
     return {
       index,
       value,
-      criteria: spec.map(([field]) => value[field])
+      criteria: fields.map((field) => isFunction(field) ? field(value) : value[field])
     };
   }
 
@@ -88,11 +88,11 @@ export function sortByOrder(input, spec) {
   return input
     .map(wrap)
     .sort(comparator)
-    .map(unwrapForSort);
+    .map(({ value }) => value);
 }
 
-function unwrapForSort(wrappedValue) {
-  return wrappedValue.value;
+function getSortMultiplier(orderName) {
+  return orderName === "desc" ? -1 : 1;
 }
 
 function compareValues(a, b) {
