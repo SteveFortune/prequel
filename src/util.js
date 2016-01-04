@@ -1,3 +1,5 @@
+const DESC = "desc";
+
 function reduceToObject(inputArray, getKey, getValue) {
   const keyFunc = isFunction(getKey) ? getKey : obj => obj[getKey];
 
@@ -62,7 +64,19 @@ export function sortByOrder(input, fields = [], orders = []) {
     return input;
   }
 
-  const orderMultipliers = orders.map(getSortMultiplier);
+  const orderMultipliers = orders.map(order => (order === "desc") ? -1 : 1);
+
+  function wrap(value, index) {
+    return {
+      index,
+      value,
+      criteria: fields.map((field) => (
+        isFunction(field)
+          ? field(value)
+          : value[field]
+      ))
+    };
+  }
 
   function comparator(a, b) {
     for (let i = 0; i < a.criteria.length; i ++) {
@@ -72,27 +86,15 @@ export function sortByOrder(input, fields = [], orders = []) {
       }
     }
 
+    // preserve original order for equal a, b
     return compareValues(a.index, b.index);
   }
 
-  function wrap(value, index) {
-    return {
-      index,
-      value,
-      criteria: fields.map((field) => isFunction(field) ? field(value) : value[field])
-    };
-  }
-
-
-  // Sort a wrapped form of in the input to make Array.sort stable
+  // Sort a wrapped form of `input` to make Array.sort stable
   return input
     .map(wrap)
     .sort(comparator)
     .map(({ value }) => value);
-}
-
-function getSortMultiplier(orderName) {
-  return orderName === "desc" ? -1 : 1;
 }
 
 function compareValues(a, b) {
