@@ -48,7 +48,6 @@
   },
   "homepage": "https://github.com/jwhitfieldseed/prequel#readme",
   "dependencies": {
-    "lodash.sortbyorder": "^3.4.4"
   },
   "devDependencies": {
     "babel-cli": "^6.2.0",
