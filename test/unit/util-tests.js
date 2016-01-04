@@ -111,7 +111,6 @@ test("result", (t) => {
 });
 
 // Test against lodash's implementation
-// (ignoring un-sorted columns)
 test("sortByOrder", (t) => {
   const input = [];
   for (let a = 0; a < 3; a ++) {
@@ -135,6 +134,7 @@ test("sortByOrder", (t) => {
   testOrder(["a", "b", "c", "d"], ["desc", "asc", "desc", "asc"]);
   testOrder(["c"], ["desc"]);
   testOrder(["d"], ["asc"]);
+  testOrder();
 
   t.end();
 });
