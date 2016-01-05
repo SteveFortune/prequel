@@ -173,6 +173,9 @@ testQuery(`SELECT age, COUNT(DISTINCT name) AS names, AVG(unread) as u FROM ${ta
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING names = 1 ORDER BY age`);
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 ORDER BY age`);
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) = 1 AND AVG(unread) > 1 ORDER BY age`);
+testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) < age`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT age as age2, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING names < age2`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT fruit FROM ${table} GROUP BY fruit HAVING COUNT(name) = COUNT(DISTINCT name)`, { test: matchGroupsInAnyOrder });
 
 
 

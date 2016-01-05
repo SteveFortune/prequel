@@ -57,6 +57,16 @@ test("SELECT MAX(age) FROM ${testData} GROUP BY ${row => row.fruit}", (t) => {
   t.end();
 });
 
+test("SELECT fruit, COUNT(DISTINCT ${row => row.name[0]}) as initials FROM ${testData} GROUP BY ${row => row.fruit} HAVING initials > 4", (t) => {
+  // result2 re-specifies the aggregation in HAVING
+  const result = prequel`SELECT fruit, COUNT(DISTINCT ${row => row.name[0]}) as initials FROM ${testData} GROUP BY ${row => row.fruit} HAVING initials > 4`;
+  const result2 = prequel`SELECT fruit, COUNT(DISTINCT ${row => row.name[0]}) as initials FROM ${testData} GROUP BY ${row => row.fruit} HAVING COUNT(DISTINCT ${row => row.name[0]}) > 4`;
+
+  t.deepEqual(result, [{ fruit: "strawberry", initials: 5 }, { fruit: "apple", initials: 11 }]);
+  t.deepEqual(result2, result);
+  t.end();
+});
+
 test("SELECT age FROM ${testData} ORDER BY ${row => -1 * row.age} LIMIT 3", (t) => {
   const result = prequel`SELECT age FROM ${testData} ORDER BY ${row => -1 * row.age} LIMIT 3`;
   t.deepEqual(result.map(r => r.age), [40, 39, 38]);
