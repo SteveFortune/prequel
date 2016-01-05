@@ -14,20 +14,55 @@ import createDb, { testData } from "./test-harness";
 const table = "test";
 const db = createDb(table);
 
+function executePrequel(sql) {
+  const parsed = prequelParse(sql);
+  return execute(parsed, { [table]: testData });
+}
+
 function testQuery(sql, { test=deepEqual, log=false, only=false, skip=false } = {}) {
   if (skip) return;
   const tapeFunc = only ? tape.only : tape;
 
-  tapeFunc(sql, function(t) {
+  tapeFunc(sql, (t) => {
     const dbResult = db.query(sql);
+    const prequelResult = executePrequel(sql);
+
     if(log) {
       t.comment(JSON.stringify(dbResult));
     }
 
-    const parsed = prequelParse(sql);
-    const prequelResult = execute(parsed, { [table]: testData });
-
     test(t, prequelResult, dbResult);
+  });
+}
+
+// Test that sqlite and prequel both throw an error
+function testError(sql, only=false, skip=false) {
+  if (skip) return;
+  const tapeFunc = only ? tape.only : tape;
+
+  tapeFunc(sql, (t) => {
+    let dbError;
+    let prequelError;
+    let dbResult;
+    let prequelResult;
+
+    try { dbResult = db.query(sql); }
+    catch (e) { dbError = e; }
+
+    try { prequelResult = executePrequel(sql); }
+    catch (e) { prequelError = e; }
+
+    if (dbError && prequelError) {
+      t.pass();
+    } else if (!dbError) {
+      t.fail(`Expected sqlite and prequel to throw. Only prequel threw. sqlite result: ${JSON.stringify(dbResult)}`);
+    } else if (!prequelError) {
+      t.fail(`Expected sqlite and prequel to throw. Only sqlite threw. prequel result: ${JSON.stringify(prequelResult)}`);
+    } else {
+      t.fail("Expected sqlite and prequel to throw. Neither threw.");
+    }
+
+    t.end();
   });
 }
 
@@ -100,10 +135,16 @@ testQuery(`SELECT name FROM ${table} WHERE NOT age BETWEEN 20 and 22`);
 testQuery(`SELECT name FROM ${table} WHERE age IN (30, 35, 40)`);
 testQuery(`SELECT name FROM ${table} WHERE age IN (22, id, "test")`);
 
+testError(`SELECT select FROM ${table} id = 1`);
+testError(`SELECT WHERE FROM ${table} id = 1`);
+testError(`SELECT GROUP FROM ${table} id = 1`);
+testError(`SELECT HAVING FROM ${table} id = 1`);
+testError(`SELECT ORDER FROM ${table} id = 1`);
+
 // Overall aggregation
 testQuery(`SELECT COUNT(DISTINCT age) AS n_ages FROM ${table}`);
 testQuery(`SELECT AVG(age) AS avg_age FROM ${table}`);
-// testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups}); // FIXME fails on default agg - sqlite seems to use LAST
+testQuery(`SELECT COUNT(DISTINCT age), greeting FROM ${table}`, { test: matchGroups, skip: 1 }); // FIXME fails on default agg - sqlite seems to use LAST
 testQuery(`SELECT COUNT(*) FROM ${table}`, { test: matchGroups });
 testQuery(`SELECT COUNT(DISTINCT age) AS uniq_age FROM ${table}`);
 testQuery(`SELECT AVG(age) FROM ${table}`, { test: matchGroups });
