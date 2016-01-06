@@ -7,17 +7,18 @@
     "build-parser": "pegjs src/sql.pegjs dist/pegjs-parser.js",
     "pretest": "npm run build-parser",
     "unit-test": "nyc tape \"./test/unit/**/*.js\" | faucet && nyc report --reporter text",
-    "integration-test": "babel-node $(which tape) \"./test/integration/**/*.js\" | faucet",
+    "integration-test": "babel-node $(which tape) \"./test/integration/**/*-tests.js\" | faucet",
     "preno-transpile-test": "npm run build",
     "no-transpile-test": "tape \"test/no-transpile/**/*.js\" | faucet",
     "test": "npm run unit-test && npm run integration-test",
     "coveralls": "nyc report --reporter text-lcov | coveralls",
-    "clean": "rm -rf dist/* coverage .nyc_output",
+    "clean": "rm -rf dist/* coverage .nyc_output test/data/test-data.sqlite",
     "lint": "eslint src/**/*.js test/**/*.js",
     "node": "babel-node",
     "prebuild": "npm run build-parser",
     "build": "babel -d dist src",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "sqlite": "babel-node test/integration/write-test-db.js test/data/test-data.sqlite && sqlite3 test/data/test-data.sqlite"
   },
   "browserify": {
     "transform": [

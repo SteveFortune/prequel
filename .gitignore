@@ -36,3 +36,4 @@ jsconfig.json
 # Others
 /tmp
 /dist/*
+*.sqlite

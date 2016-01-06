@@ -1,12 +1,12 @@
-import { readFileSync as read } from "fs";
+import { readFileSync as read, writeFileSync } from "fs";
 import { join } from "path";
 
 import sqljs from "sql.js";
 import { mapObject } from "../../src/util";
 
-export const testData = JSON.parse(read(join(__dirname, "./data.json")));
+export const testData = JSON.parse(read(join(__dirname, "..", "data", "data.json")));
 
-export default function init(tableName) {
+export default function init(tableName = "test") {
   const db = new sqljs.Database();
 
   createTable();
@@ -59,6 +59,11 @@ export default function init(tableName) {
       }
 
       return results;
+    },
+    write(filePath) {
+      const data = db.export();
+      const buffer = new Buffer(data);
+      writeFileSync(filePath, buffer);
     }
   };
 
