@@ -205,3 +205,13 @@ test("IN", (t) => {
 
   t.end();
 });
+
+test("STRCMP", (t) => {
+  const strcmp = operators["STRCMP"];
+
+  t.equal(strcmp("text", "text2"), -1);
+  t.equal(strcmp("text2", "text"), 1);
+  t.equal(strcmp("text", "text"), 0);
+
+  t.end();
+});

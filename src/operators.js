@@ -67,6 +67,7 @@ const operators = {
   "RLIKE": matches,
   "=~": matches,
   "~": matches,
+  "STRCMP": (a, b) => a.localeCompare(b),
 };
 
 export default operators;

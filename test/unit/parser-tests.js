@@ -83,6 +83,12 @@ test("WHERE IN", (t) => {
   t.end();
 });
 
+test("WHERE STRCMP", (t) => {
+  const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE STRCMP(f1, 'string')");
+  t.deepEqual(out.where, { lhs: { identifier: "f1" }, op: "STRCMP", rhs: { literal: "string" } });
+  t.end();
+});
+
 // NOT's argument is parsed as LHS because it simplifies evaluation semantics
 test("WHERE NOT", (t) => {
   const out = parseInsensitive(t, "SELECT f1 FROM wat WHERE NOT a = 2");

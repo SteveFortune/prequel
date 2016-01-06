@@ -1,6 +1,7 @@
 /* eslint camelcase:[0] */
 import test from "tape";
 import prequel from "../../src";
+import _ from "lodash";
 import { testData } from "./test-harness";
 
 // End-to-end tests for prequel features that cannot be tested directly against sqlite.
@@ -110,6 +111,12 @@ test("SELECT name FROM ${testData} LIMIT ${3}", (t) => {
 test("SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}", (t) => {
   const result = prequel`SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}`;
   t.deepEqual(result.map(r => r.name), ["Margie Duffy", "Thelma Johnston"]);
+  t.end();
+});
+
+test("prequel`SELECT name FROM ${testData} WHERE STRCMP(name, 'Margie Duffy')`", (t) => {
+  const result = prequel`SELECT name FROM ${testData} WHERE STRCMP(name, 'Margie Duffy')`;
+  t.notOk(_.contains(result, "Margie Duffy"));
   t.end();
 });
 
