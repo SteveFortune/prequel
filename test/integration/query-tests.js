@@ -134,6 +134,13 @@ test("prequel`SELECT not, there FROM ${testData}`", (t) => {
   t.end();
 });
 
+// Mixed identifier types in an operator argument
+test("prequel`SELECT name FROM ${testData} WHERE age IN (unread, 28)`", (t) => {
+  const result = prequel`SELECT name FROM ${testData} WHERE age IN (id, 28, ${29}, ${row => row + 5})`;
+  t.deepEqual(["Thelma Johnston", "Corine Hale", "Vaughan Stevens", "King Farley", "Rocha Shepard"], result.map(r => r.name));
+  t.end();
+});
+
 // Error conditions
 // Aggregation function in WHERE
 test("prequel`SELECT name FROM ${testData} WHERE AVG(age) > 20`", (t) => {
