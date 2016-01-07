@@ -1,5 +1,6 @@
 /* eslint camelcase:[0] */
 import test from "tape";
+import _ from "lodash";
 import execute from "../../src/execute";
 
 function* wrap(inputArray) {
@@ -124,6 +125,15 @@ test("SELECT a FROM x WHERE a IN [1, 2]", (t) => {
 
   const result = testQuery(t, q, input);
   t.deepEqual(result, [{ a: 1 }, { a: 2 }]);
+  t.end();
+});
+
+test("SELECT a FROM x WHERE 1", (t) => {
+  const input = [1, 2, 3, 4, 5].map(a => ({ a }));
+  const q = { fields: [{ name: "a" }], where: { literal: 1 }, source: "$1" };
+
+  const result = testQuery(t, q, input);
+  t.deepEqual(_.pluck(result, "a"), [1, 2, 3, 4, 5]);
   t.end();
 });
 

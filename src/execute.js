@@ -62,16 +62,16 @@ function filter(input, condition, context, resolve) {
 
 // Return a function that evaluates an expression for the given input
 function buildExpression(expr, context, resolve) {
-  if(expr.op) {
+  if("op" in expr) {
     const func = buildOperatorExpression(expr, context, resolve);
     return (row, rowNum) => {
       return func(row, rowNum);
     };
-  } else if (expr.identifier) {
+  } else if ("identifier" in expr) {
     return (row, rowNum) => resolve(expr.identifier, row, rowNum);
-  } else if(expr.literal) {
+  } else if("literal" in expr) {
     return () => expr.literal;
-  } else if (expr.aggregate) {
+  } else if ("aggregate" in expr) {
     if (context !== HAVING ) {
       throw new Error(`Could not use aggregate function ${expr.aggregate} in ${context}. Did you mean HAVING?`);
     }

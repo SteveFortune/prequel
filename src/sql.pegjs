@@ -197,6 +197,7 @@ operator_expression
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
   / identifier:identifier { return { identifier: identifier } }
+  / literal:literal { return { literal: literal } }
 
 base_expression
   = operator_expression

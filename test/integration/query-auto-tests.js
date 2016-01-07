@@ -134,6 +134,9 @@ testQuery(`SELECT name FROM ${table} WHERE age BETWEEN 20 and 22`);
 testQuery(`SELECT name FROM ${table} WHERE NOT age BETWEEN 20 and 22`);
 testQuery(`SELECT name FROM ${table} WHERE age IN (30, 35, 40)`);
 testQuery(`SELECT name FROM ${table} WHERE age IN (22, id, "test")`);
+testQuery(`SELECT name FROM ${table} WHERE 0`);
+testQuery(`SELECT name FROM ${table} WHERE 1`);
+testQuery(`SELECT name FROM ${table} WHERE 1 AND age = 22`);
 
 testError(`SELECT select FROM ${table} id = 1`);
 testError(`SELECT WHERE FROM ${table} id = 1`);
@@ -176,7 +179,8 @@ testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age 
 testQuery(`SELECT age, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING COUNT(name) < age`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT age as age2, COUNT(DISTINCT name) AS names FROM ${table} GROUP BY age HAVING names < age2`, { test: matchGroupsInAnyOrder });
 testQuery(`SELECT fruit FROM ${table} GROUP BY fruit HAVING COUNT(name) = COUNT(DISTINCT name)`, { test: matchGroupsInAnyOrder });
-
+testQuery(`SELECT age, COUNT(name) FROM test GROUP BY age HAVING 1`, { test: matchGroupsInAnyOrder });
+testQuery(`SELECT age, COUNT(name) FROM test GROUP BY age HAVING (1 OR 0) AND COUNT(NAME) > 2`, { test: matchGroupsInAnyOrder });
 
 
 // LIMIT

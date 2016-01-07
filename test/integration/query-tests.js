@@ -141,6 +141,13 @@ test("prequel`SELECT name FROM ${testData} WHERE age IN (unread, 28)`", (t) => {
   t.end();
 });
 
+// sqlite counts string literals as falsy
+test("prequel`SELECT name FROM ${testData} WHERE \"wat\" LIMIT 2`", (t) => {
+  const result = prequel`SELECT name FROM ${testData} WHERE "wat" LIMIT 2`;
+  t.deepEqual(["Strickland Montoya", "Margie Duffy"], result.map(r => r.name));
+  t.end();
+});
+
 // Error conditions
 // Aggregation function in WHERE
 test("prequel`SELECT name FROM ${testData} WHERE AVG(age) > 20`", (t) => {
