@@ -177,6 +177,7 @@ or = "OR"i { return T() }
 not = "NOT"i { return T() }
 between = "BETWEEN"i { return T() }
 in = "IN"i { return T() }
+strcmp = "STRCMP"i { return T() }
 
 // Expressions use unrolled recursion
 // HT http://stackoverflow.com/a/30798758/2806996
@@ -196,6 +197,7 @@ operator_expression
   / lhs:operand _ op:binary_operator _ rhs:operand { return OP(op, lhs, rhs) }
   / between:between_expression { return between }
   / in_expr:in_expression { return in_expr }
+  / strcmp_expr:strcmp_expression { return strcmp_expr }
   / identifier:identifier { return { identifier: identifier } }
   / literal:literal { return { literal: literal } }
 
@@ -227,6 +229,9 @@ between_expression
 
 in_expression
   = lhs:operand __ op:in __ lp rhs:operand_list rp { return OP(op, lhs, rhs) }
+
+strcmp_expression
+  = op:strcmp lp lhs:operand list_delim rhs:operand rp { return OP(op, lhs, rhs) }
 
 binary_operator
   = "=" / ">=" / "<>" / ">" / "<=" / "<" / "!=" / like / rlike
