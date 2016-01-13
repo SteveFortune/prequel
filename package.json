@@ -48,8 +48,7 @@
     "url": "https://github.com/jwhitfieldseed/prequel/issues"
   },
   "homepage": "https://github.com/jwhitfieldseed/prequel#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.2.0",
     "babel-core": "^6.2.1",
@@ -60,7 +59,7 @@
     "eslint": "^1.10.3",
     "faucet": "0.0.1",
     "istanbul": "^0.4.1",
-    "lodash": "^3.10.0",
+    "lodash": "^4.0.0",
     "nyc": "^5.0.0",
     "pegjs": "^0.9.0",
     "sql.js": "^0.2.21",
