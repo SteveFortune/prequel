@@ -125,7 +125,7 @@ test("sortByOrder", (t) => {
 
   function testOrder(fields, orders) {
     const result = sortByOrder(input, fields, orders);
-    const controlResult = _.sortByOrder(input, fields, orders);
+    const controlResult = _.orderBy(input, fields, orders);
 
     t.deepEqual(result, controlResult);
   }

@@ -133,7 +133,7 @@ test("SELECT a FROM x WHERE 1", (t) => {
   const q = { fields: [{ name: "a" }], where: { literal: 1 }, source: "$1" };
 
   const result = testQuery(t, q, input);
-  t.deepEqual(_.pluck(result, "a"), [1, 2, 3, 4, 5]);
+  t.deepEqual(_.map(result, "a"), [1, 2, 3, 4, 5]);
   t.end();
 });
 

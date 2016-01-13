@@ -116,7 +116,7 @@ test("SELECT name FROM ${testData} LIMIT ${() => 1}, ${2}", (t) => {
 
 test("prequel`SELECT name FROM ${testData} WHERE STRCMP(name, 'Margie Duffy')`", (t) => {
   const result = prequel`SELECT name FROM ${testData} WHERE STRCMP(name, 'Margie Duffy')`;
-  t.notOk(_.contains(result, "Margie Duffy"));
+  t.notOk(_.includes(result, "Margie Duffy"));
   t.end();
 });
 
