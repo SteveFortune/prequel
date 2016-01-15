@@ -1,6 +1,6 @@
 import test from "tape";
 import _ from "lodash";
-import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists, result, sortByOrder } from "../../src/util";
+import { groupBy, indexBy, isFunction, isArray, mapObject, pickKeys, objectValues, exists, result, sortByOrder, negate } from "../../src/util";
 
 test("groupBy key name", (t) => {
   const input = [{ a: 1, b: 2 }, { a: 1, b: 3 }, { a: 2, b: 3 }, { a: 2, b: 4}];
@@ -136,5 +136,13 @@ test("sortByOrder", (t) => {
   testOrder(["d"], ["asc"]);
   testOrder();
 
+  t.end();
+});
+
+test("negate", (t) => {
+  t.false(negate(() => true)());
+  t.true(negate(() => false)());
+  t.false(negate((a) => a == null)(null));
+  t.true(negate((a) => a == null)("str"));
   t.end();
 });

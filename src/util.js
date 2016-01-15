@@ -49,6 +49,10 @@ export function objectValues(inputObject) {
   return Object.keys(inputObject).map(key => inputObject[key]);
 }
 
+export function negate(fn) {
+  return (...args) => !fn.apply(this, args);
+}
+
 export function exists(value) {
   return typeof value !== "undefined";
 }

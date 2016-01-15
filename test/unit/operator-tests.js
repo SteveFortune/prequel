@@ -215,3 +215,15 @@ test("STRCMP", (t) => {
 
   t.end();
 });
+
+test("COALESCE", (t) => {
+  const coalesce = operators["COALESCE"];
+
+  t.equal(coalesce([null, 1]), 1);
+  t.equal(coalesce([null, null, null]), null);
+  t.equal(coalesce([null, null, 1]), 1);
+  t.equal(coalesce([null, undefined, 1]), 1);
+  t.equal(coalesce([null, undefined, undefined]), null);
+
+  t.end();
+});

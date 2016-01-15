@@ -1,3 +1,5 @@
+import { negate, exists } from "./util"
+
 const and = (a, b) => a && b;
 const or = (a, b) => a || b;
 const not = (a) => !a;
@@ -44,6 +46,18 @@ const like = (value, wildcardPattern) => {
     return pattern.test(value);
 };
 
+const isNull = (a) => a == null
+const isNotNull = negate(isNull)
+
+const coalesce = (list) => {
+  for (let value of list) {
+    if (exists(value) && isNotNull(value)) {
+      return value;
+    }
+  }
+  return null;
+};
+
 const operators = {
   "=": (a, b) => a === b,
   "!=": (a, b) => a !== b,
@@ -52,8 +66,8 @@ const operators = {
   "<=": (a, b) => a <= b,
   ">": (a, b) => a > b,
   ">=": (a, b) => a >= b,
-  "IS NULL": a => a == null,
-  "IS NOT NULL": a => a != null,
+  "IS NULL": isNull,
+  "IS NOT NULL": isNotNull,
   "BETWEEN": (a, b, c) => a >= b && a <= c,
   "IN": (a, b) =>  b.indexOf(a) >= 0,
   "AND": and,
@@ -68,6 +82,7 @@ const operators = {
   "=~": matches,
   "~": matches,
   "STRCMP": (a, b) => a.localeCompare(b),
+  "COALESCE": coalesce,
 };
 
 export default operators;
