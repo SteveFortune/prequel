@@ -1,4 +1,4 @@
-import { negate, exists } from "./util"
+import { negate } from "./util";
 
 const and = (a, b) => a && b;
 const or = (a, b) => a || b;
@@ -46,12 +46,12 @@ const like = (value, wildcardPattern) => {
     return pattern.test(value);
 };
 
-const isNull = (a) => a == null
-const isNotNull = negate(isNull)
+const isNull = (a) => a == null;
+const isNotNull = negate(isNull);
 
 const coalesce = (list) => {
-  for (let value of list) {
-    if (exists(value) && isNotNull(value)) {
+  for (const value of list) {
+    if (isNotNull(value)) {
       return value;
     }
   }
